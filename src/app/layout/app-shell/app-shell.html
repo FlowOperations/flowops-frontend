@@ -1,0 +1,50 @@
+<div class="shell">
+  <aside class="sidebar">
+    <a class="brand" routerLink="/dashboard">
+      <span class="brand__mark">F</span>
+      <span>FlowOps</span>
+    </a>
+
+    <nav class="navigation" aria-label="Navegação principal">
+      <span class="navigation__label">Workspace</span>
+      @for (item of navigationItems; track item.route) {
+        <a
+          class="navigation__item"
+          [routerLink]="item.route"
+          routerLinkActive="navigation__item--active"
+        >
+          <app-icon [name]="item.icon" [size]="19" />
+          <span>{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+
+    <div class="workspace-card">
+      <span class="workspace-card__avatar">FO</span>
+      <span>
+        <strong>FlowOps</strong>
+        <small>Ambiente principal</small>
+      </span>
+    </div>
+  </aside>
+
+  <div class="workspace">
+    <header class="topbar">
+      <label class="search">
+        <app-icon name="search" [size]="18" />
+        <input type="search" placeholder="Pesquisar no FlowOps" aria-label="Pesquisar" />
+      </label>
+
+      <div class="topbar__profile">
+        <button class="icon-button" type="button" aria-label="Notificações">
+          <app-icon name="bell" [size]="19" />
+        </button>
+        <span class="profile-avatar">DR</span>
+      </div>
+    </header>
+
+    <main class="content">
+      <router-outlet />
+    </main>
+  </div>
+</div>

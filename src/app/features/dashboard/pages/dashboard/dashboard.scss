@@ -1,0 +1,98 @@
+.indicators {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 20px;
+}
+
+.indicator-card,
+.panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.indicator-card { display: grid; gap: 7px; padding: 18px; }
+
+.indicator-card > span,
+.indicator-card small,
+.panel small { color: var(--color-text-muted); font-size: 12px; }
+
+.indicator-card strong { font-size: 26px; letter-spacing: -0.03em; }
+
+.dashboard-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(0, 1.7fr) minmax(280px, 0.8fr);
+}
+
+.panel { padding: 20px; }
+
+.panel header {
+  align-items: flex-start;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.panel header div { display: grid; gap: 4px; }
+.panel header > span { color: var(--color-text-muted); font-size: 12px; }
+
+.project-row {
+  align-items: center;
+  border-top: 1px solid var(--color-border);
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 10px minmax(150px, 1fr) minmax(100px, 0.8fr) 38px;
+  padding: 15px 0;
+}
+
+.project-row > span:nth-child(2) { display: grid; gap: 3px; }
+.project-row__mark { border-radius: 4px; height: 28px; }
+.project-row__mark--blue { background: #5b8def; }
+.project-row__mark--green { background: #3fb89f; }
+.project-row__mark--orange { background: #e9a23b; }
+
+.progress {
+  background: var(--color-surface-soft);
+  border-radius: 20px;
+  height: 7px;
+  overflow: hidden;
+}
+
+.progress i { background: var(--color-primary); display: block; height: 100%; }
+.project-row b { font-size: 12px; text-align: right; }
+
+.priority-list {
+  display: grid;
+  gap: 15px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.priority-list li { align-items: center; display: flex; font-size: 13px; gap: 10px; }
+
+.priority {
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 7px;
+  text-transform: uppercase;
+}
+
+.priority--high { background: #fee4e2; color: #b42318; }
+.priority--medium { background: #fff0d5; color: #b15d00; }
+.priority--low { background: #e1f5ee; color: #087a66; }
+
+@media (max-width: 1080px) {
+  .indicators { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dashboard-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 620px) {
+  .indicators { grid-template-columns: 1fr; }
+  .project-row { grid-template-columns: 8px 1fr 38px; }
+  .progress { display: none; }
+}

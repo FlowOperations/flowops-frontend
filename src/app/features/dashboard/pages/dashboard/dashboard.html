@@ -1,0 +1,59 @@
+<app-page-header
+  title="Visão geral"
+  description="Acompanhe operações, entregas e pontos que exigem atenção."
+/>
+
+<section class="indicators" aria-label="Indicadores">
+  @for (indicator of indicators; track indicator.label) {
+    <article class="indicator-card">
+      <span>{{ indicator.label }}</span>
+      <strong>{{ indicator.value }}</strong>
+      <small>{{ indicator.detail }}</small>
+    </article>
+  }
+</section>
+
+<section class="dashboard-grid">
+  <article class="panel panel--wide">
+    <header>
+      <div>
+        <strong>Projetos recentes</strong>
+        <small>Visão consolidada do andamento</small>
+      </div>
+      <span>Últimos 30 dias</span>
+    </header>
+
+    <div class="project-row">
+      <span class="project-row__mark project-row__mark--blue"></span>
+      <span><strong>Atualização Java</strong><small>12 de 18 tarefas</small></span>
+      <span class="progress"><i style="width: 67%"></i></span>
+      <b>67%</b>
+    </div>
+    <div class="project-row">
+      <span class="project-row__mark project-row__mark--green"></span>
+      <span><strong>Portal interno</strong><small>20 de 25 tarefas</small></span>
+      <span class="progress"><i style="width: 80%"></i></span>
+      <b>80%</b>
+    </div>
+    <div class="project-row">
+      <span class="project-row__mark project-row__mark--orange"></span>
+      <span><strong>Integração fiscal</strong><small>7 de 16 tarefas</small></span>
+      <span class="progress"><i style="width: 44%"></i></span>
+      <b>44%</b>
+    </div>
+  </article>
+
+  <article class="panel">
+    <header>
+      <div>
+        <strong>Prioridades</strong>
+        <small>Itens para acompanhar</small>
+      </div>
+    </header>
+    <ul class="priority-list">
+      <li><span class="priority priority--high">Alta</span>Revisar autenticação</li>
+      <li><span class="priority priority--medium">Média</span>Validar escopo fiscal</li>
+      <li><span class="priority priority--low">Baixa</span>Atualizar documentação</li>
+    </ul>
+  </article>
+</section>

@@ -1,0 +1,61 @@
+<app-page-header
+  title="Auditoria"
+  description="Revise tarefas enviadas e decida o próximo passo."
+/>
+
+@if (feedback()) {
+  <div class="notice">{{ feedback() }}</div>
+}
+
+<section class="audit-list">
+  @for (task of tasks(); track task.id) {
+    <article class="audit-card">
+      <div class="audit-card__main">
+        <span class="priority-tag priority-tag--{{ task.prioridade.toLowerCase() }}">{{
+          task.prioridade
+        }}</span>
+        <h2>{{ task.titulo }}</h2>
+        <p>{{ task.descricao }}</p>
+        <small>Responsável: {{ task.responsavelNome }}</small>
+      </div>
+      <div class="audit-card__actions">
+        <button class="button button--ghost" type="button" (click)="openCorrection(task)">
+          Solicitar correção
+        </button>
+        <button class="button button--primary" type="button" (click)="approve(task)">
+          Aprovar tarefa
+        </button>
+      </div>
+    </article>
+  } @empty {
+    <div class="state-card">Nenhuma tarefa aguardando sua auditoria.</div>
+  }
+</section>
+
+@if (correctionTask(); as task) {
+  <div class="dialog-backdrop" (click)="closeCorrection()">
+    <form class="dialog-card" (click)="$event.stopPropagation()" (ngSubmit)="submitCorrection()">
+      <span class="eyebrow">Revisão necessária</span>
+      <h2>Solicitar correção</h2>
+      <p>
+        Explique objetivamente o que precisa ser ajustado em <strong>{{ task.titulo }}</strong
+        >.
+      </p>
+      <label
+        >Motivo<textarea
+          name="reason"
+          [(ngModel)]="correctionReason"
+          rows="5"
+          maxlength="2000"
+          required
+        ></textarea>
+      </label>
+      <div class="form-actions">
+        <button class="button button--ghost" type="button" (click)="closeCorrection()">
+          Cancelar
+        </button>
+        <button class="button button--primary" type="submit">Enviar solicitação</button>
+      </div>
+    </form>
+  </div>
+}

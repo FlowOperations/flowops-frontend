@@ -1,0 +1,61 @@
+<main class="login-page">
+  <section class="login-visual">
+    <a class="login-brand" routerLink="/login">
+      <span class="brand-symbol"><img src="/assets/flowops-logo.png" alt="" /></span>
+      <span>Flow<span>Ops</span></span>
+    </a>
+    <div>
+      <span class="eyebrow">Seu trabalho em movimento</span>
+      <h1>Comece com clareza desde o primeiro fluxo.</h1>
+      <p>Crie sua conta e solicite acesso ao ambiente da sua empresa.</p>
+    </div>
+    <small>Uma operação organizada começa por aqui.</small>
+  </section>
+
+  <section class="login-form-area">
+    <form class="login-card login-card--register" (ngSubmit)="submit()">
+      <a class="login-card__mobile-brand" routerLink="/login">
+        <span class="brand-symbol"><img src="/assets/flowops-logo.png" alt="" /></span>
+        FlowOps
+      </a>
+      <div>
+        <span class="eyebrow">Nova conta</span>
+        <h2>Crie seu acesso</h2>
+        <p>Preencha os dados essenciais para continuar.</p>
+      </div>
+
+      <div class="auth-form-grid">
+        <label class="auth-form-grid__wide"
+          >Nome completo<input name="name" [(ngModel)]="name" autocomplete="name" required
+        /></label>
+        <label
+          >CPF<input name="cpf" [(ngModel)]="cpf" inputmode="numeric" maxlength="14" required
+        /></label>
+        <label
+          >Data de nascimento<input name="birthDate" [(ngModel)]="birthDate" type="date" required
+        /></label>
+        <label class="auth-form-grid__wide"
+          >E-mail<input name="email" [(ngModel)]="email" type="email" autocomplete="email" required
+        /></label>
+        <label class="auth-form-grid__wide"
+          >Senha<input
+            name="password"
+            [(ngModel)]="password"
+            type="password"
+            autocomplete="new-password"
+            minlength="8"
+            required
+        /></label>
+      </div>
+
+      @if (error()) {
+        <p class="form-error">{{ error() }}</p>
+      }
+
+      <button class="button button--primary button--large" type="submit" [disabled]="loading()">
+        {{ loading() ? 'Criando conta...' : 'Criar minha conta' }}
+      </button>
+      <p class="auth-switch">Já possui uma conta? <a routerLink="/login">Entrar</a></p>
+    </form>
+  </section>
+</main>

@@ -1,0 +1,60 @@
+<main class="login-page">
+  <section class="login-visual">
+    <a class="login-brand" routerLink="/login">
+      <span class="brand-symbol"><img src="/assets/flowops-logo.png" alt="" /></span>
+      <span>Flow<span>Ops</span></span>
+    </a>
+    <div>
+      <span class="eyebrow">Fluxos claros. Entregas melhores.</span>
+      <h1>Organize o trabalho da sua equipe em um só lugar.</h1>
+      <p>Projetos, tarefas e auditorias conectados em um fluxo simples e seguro.</p>
+    </div>
+    <small>Operação com visibilidade do início ao fim.</small>
+  </section>
+
+  <section class="login-form-area">
+    <form class="login-card" (ngSubmit)="submit()">
+      <a class="login-card__mobile-brand" routerLink="/login">
+        <span class="brand-symbol"><img src="/assets/flowops-logo.png" alt="" /></span>
+        FlowOps
+      </a>
+      <div>
+        <span class="eyebrow">Bem-vindo de volta</span>
+        <h2>Acesse sua conta</h2>
+        <p>Entre com o CPF e a senha cadastrados.</p>
+      </div>
+
+      <label>
+        CPF
+        <input
+          name="cpf"
+          [(ngModel)]="cpf"
+          inputmode="numeric"
+          maxlength="14"
+          placeholder="000.000.000-00"
+          required
+        />
+      </label>
+      <label>
+        Senha
+        <input
+          name="senha"
+          [(ngModel)]="senha"
+          type="password"
+          placeholder="Sua senha"
+          required
+          minlength="8"
+        />
+      </label>
+
+      @if (error()) {
+        <p class="form-error">{{ error() }}</p>
+      }
+
+      <button class="button button--primary button--large" type="submit" [disabled]="loading()">
+        {{ loading() ? 'Entrando...' : 'Entrar no FlowOps' }}
+      </button>
+      <p class="auth-switch">Ainda não possui acesso? <a routerLink="/cadastro">Criar conta</a></p>
+    </form>
+  </section>
+</main>

@@ -1,8 +1,24 @@
 import { Routes } from '@angular/router';
+import { authGuard, guestGuard } from '@core/guards/auth.guard';
 
 export const routes: Routes = [
   {
+    path: 'login',
+    canActivate: [guestGuard],
+    title: 'Entrar | FlowOps',
+    loadComponent: () =>
+      import('./features/auth/pages/login/login').then((component) => component.Login),
+  },
+  {
+    path: 'cadastro',
+    canActivate: [guestGuard],
+    title: 'Criar conta | FlowOps',
+    loadComponent: () =>
+      import('./features/auth/pages/register/register').then((component) => component.Register),
+  },
+  {
     path: '',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./layout/app-shell/app-shell').then((component) => component.AppShell),
     children: [

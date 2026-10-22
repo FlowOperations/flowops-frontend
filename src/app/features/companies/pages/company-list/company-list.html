@@ -1,0 +1,31 @@
+<app-page-header
+  title="Empresas"
+  description="Encontre sua empresa e solicite acesso ao ambiente de trabalho."
+/>
+
+@if (feedback()) {
+  <div class="notice">{{ feedback() }}</div>
+}
+
+@if (loading()) {
+  <div class="state-card">Carregando empresas...</div>
+} @else {
+  <section class="card-grid">
+    @for (company of companies(); track company.id) {
+      <article class="entity-card">
+        <div class="entity-card__icon">{{ company.nomeFantasia.slice(0, 2).toUpperCase() }}</div>
+        <div class="entity-card__content">
+          <span class="status status--active">Ativa</span>
+          <h2>{{ company.nomeFantasia }}</h2>
+          <p>{{ company.razaoSocial }}</p>
+          <small>CNPJ {{ company.cnpj }}</small>
+        </div>
+        <button class="button button--secondary" type="button" (click)="requestAccess(company)">
+          Solicitar acesso
+        </button>
+      </article>
+    } @empty {
+      <div class="state-card">Nenhuma empresa disponível no momento.</div>
+    }
+  </section>
+}

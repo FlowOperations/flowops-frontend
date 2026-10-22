@@ -1,8 +1,8 @@
 <div class="shell">
   <aside class="sidebar">
     <a class="brand" routerLink="/dashboard">
-      <span class="brand__mark">F</span>
-      <span>FlowOps</span>
+      <span class="brand__mark"><img src="/assets/flowops-logo.png" alt="" /></span>
+      <span class="brand__name">Flow<span>Ops</span></span>
     </a>
 
     <nav class="navigation" aria-label="Navegação principal">
@@ -20,26 +20,31 @@
     </nav>
 
     <div class="workspace-card">
-      <span class="workspace-card__avatar">FO</span>
+      <span class="workspace-card__avatar">{{ auth.initials() }}</span>
       <span>
-        <strong>FlowOps</strong>
-        <small>Ambiente principal</small>
+        <strong>{{ auth.user()?.nomeCompleto }}</strong>
+        <small>{{
+          auth.user()?.perfilSistema === 'ADMIN_FLOWOPS'
+            ? 'Administração FlowOps'
+            : 'Ambiente de trabalho'
+        }}</small>
       </span>
     </div>
   </aside>
 
   <div class="workspace">
     <header class="topbar">
-      <label class="search">
-        <app-icon name="search" [size]="18" />
-        <input type="search" placeholder="Pesquisar no FlowOps" aria-label="Pesquisar" />
-      </label>
-
+      <div class="topbar__context">
+        <span>Workspace</span>
+        <strong>Visão operacional</strong>
+      </div>
       <div class="topbar__profile">
-        <button class="icon-button" type="button" aria-label="Notificações">
-          <app-icon name="bell" [size]="19" />
-        </button>
-        <span class="profile-avatar">DR</span>
+        <span class="profile-avatar">{{ auth.initials() }}</span>
+        <span class="profile-copy"
+          ><strong>{{ auth.user()?.nomeCompleto }}</strong
+          ><small>{{ auth.user()?.email }}</small></span
+        >
+        <button class="logout-button" type="button" (click)="auth.logout()">Encerrar</button>
       </div>
     </header>
 

@@ -3,57 +3,65 @@
   description="Acompanhe operações, entregas e pontos que exigem atenção."
 />
 
+@if (feedback()) {
+  <div class="notice notice--error">{{ feedback() }}</div>
+}
+
 <section class="indicators" aria-label="Indicadores">
-  @for (indicator of indicators; track indicator.label) {
-    <article class="indicator-card">
-      <span>{{ indicator.label }}</span>
-      <strong>{{ indicator.value }}</strong>
-      <small>{{ indicator.detail }}</small>
-    </article>
-  }
+  <article class="indicator-card">
+    <span>Projetos ativos</span><strong>{{ activeProjects() }}</strong
+    ><small>{{ projects().length }} projetos visíveis</small>
+  </article>
+  <article class="indicator-card">
+    <span>Tarefas em andamento</span><strong>{{ runningTasks() }}</strong
+    ><small>{{ tasks().length }} tarefas no total</small>
+  </article>
+  <article class="indicator-card">
+    <span>Aguardando auditoria</span><strong>{{ auditCount() }}</strong
+    ><small>Itens disponíveis para revisão</small>
+  </article>
+  <article class="indicator-card">
+    <span>Progresso médio</span><strong>{{ averageProgress() }}%</strong
+    ><small>Todos os projetos acessíveis</small>
+  </article>
 </section>
 
 <section class="dashboard-grid">
   <article class="panel panel--wide">
     <header>
-      <div>
-        <strong>Projetos recentes</strong>
-        <small>Visão consolidada do andamento</small>
-      </div>
-      <span>Últimos 30 dias</span>
+      <div><strong>Projetos recentes</strong><small>Visão consolidada do andamento</small></div>
+      <span>{{ projects().length }} projetos</span>
     </header>
-
-    <div class="project-row">
-      <span class="project-row__mark project-row__mark--blue"></span>
-      <span><strong>Atualização Java</strong><small>12 de 18 tarefas</small></span>
-      <span class="progress"><i style="width: 67%"></i></span>
-      <b>67%</b>
-    </div>
-    <div class="project-row">
-      <span class="project-row__mark project-row__mark--green"></span>
-      <span><strong>Portal interno</strong><small>20 de 25 tarefas</small></span>
-      <span class="progress"><i style="width: 80%"></i></span>
-      <b>80%</b>
-    </div>
-    <div class="project-row">
-      <span class="project-row__mark project-row__mark--orange"></span>
-      <span><strong>Integração fiscal</strong><small>7 de 16 tarefas</small></span>
-      <span class="progress"><i style="width: 44%"></i></span>
-      <b>44%</b>
-    </div>
+    @for (project of projects().slice(0, 6); track project.id) {
+      <div class="project-row">
+        <span class="project-row__mark project-row__mark--blue"></span>
+        <span
+          ><strong>{{ project.nome }}</strong
+          ><small>{{ project.empresaNome }}</small></span
+        >
+        <span class="progress"><i [style.width.%]="project.progresso"></i></span>
+        <b>{{ project.progresso }}%</b>
+      </div>
+    } @empty {
+      <div class="dashboard-empty">Nenhum projeto disponível para acompanhar.</div>
+    }
   </article>
 
   <article class="panel">
     <header>
-      <div>
-        <strong>Prioridades</strong>
-        <small>Itens para acompanhar</small>
-      </div>
+      <div><strong>Prioridades</strong><small>Próximos itens para acompanhar</small></div>
     </header>
     <ul class="priority-list">
-      <li><span class="priority priority--high">Alta</span>Revisar autenticação</li>
-      <li><span class="priority priority--medium">Média</span>Validar escopo fiscal</li>
-      <li><span class="priority priority--low">Baixa</span>Atualizar documentação</li>
+      @for (task of priorityTasks(); track task.id) {
+        <li>
+          <span class="priority priority--{{ task.prioridade.toLowerCase() }}">{{
+            task.prioridade
+          }}</span
+          ><span>{{ task.titulo }}</span>
+        </li>
+      } @empty {
+        <li class="dashboard-empty">Nenhuma prioridade pendente.</li>
+      }
     </ul>
   </article>
 </section>

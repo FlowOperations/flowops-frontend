@@ -1,0 +1,78 @@
+<app-page-header title="Projetos" description="Crie projetos e acompanhe o progresso das entregas.">
+  <button class="button button--primary" type="button" (click)="showForm.set(!showForm())">
+    Novo projeto
+  </button>
+</app-page-header>
+
+<div class="toolbar">
+  <label
+    >Empresa
+    <select [(ngModel)]="companyId" (ngModelChange)="loadProjects()">
+      @for (link of links(); track link.id) {
+        <option [ngValue]="link.empresaId">{{ link.empresaNome }}</option>
+      }
+    </select>
+  </label>
+</div>
+
+@if (feedback()) {
+  <div class="notice notice--error">{{ feedback() }}</div>
+}
+
+@if (showForm()) {
+  <form class="form-panel" (ngSubmit)="create()">
+    <div class="form-panel__header">
+      <div>
+        <h2>Novo projeto</h2>
+        <p>Defina as informações essenciais.</p>
+      </div>
+    </div>
+    <div class="form-grid">
+      <label>Nome<input [(ngModel)]="name" name="name" required /></label>
+      <label>Descrição<input [(ngModel)]="description" name="description" required /></label>
+      <label
+        >Data inicial<input [(ngModel)]="startDate" name="startDate" type="date" required
+      /></label>
+      <label>Data final<input [(ngModel)]="endDate" name="endDate" type="date" required /></label>
+    </div>
+    <div class="form-actions">
+      <button class="button button--ghost" type="button" (click)="showForm.set(false)">
+        Cancelar</button
+      ><button class="button button--primary" type="submit">Criar projeto</button>
+    </div>
+  </form>
+}
+
+<section class="table-card">
+  <div class="table-row table-row--header">
+    <span>Projeto</span><span>Status</span><span>Progresso</span><span></span>
+  </div>
+  @for (project of projects(); track project.id) {
+    <div class="table-row">
+      <span
+        ><strong>{{ project.nome }}</strong
+        ><small>{{ project.gestorResponsavelNome }}</small></span
+      >
+      <span
+        ><span class="status">{{ project.status.replaceAll('_', ' ') }}</span></span
+      >
+      <span class="progress-cell"
+        ><span class="progress"><i [style.width.%]="project.progresso"></i></span
+        ><b>{{ project.progresso }}%</b></span
+      >
+      <span>
+        @if (project.status === 'PLANEJAMENTO') {
+          <button
+            class="button button--small button--secondary"
+            type="button"
+            (click)="start(project)"
+          >
+            Iniciar
+          </button>
+        }
+      </span>
+    </div>
+  } @empty {
+    <div class="state-card">Nenhum projeto encontrado para esta empresa.</div>
+  }
+</section>

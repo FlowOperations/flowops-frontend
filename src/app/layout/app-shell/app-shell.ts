@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { NAVIGATION_ITEMS } from '@core/config/navigation.config';
 import { Icon } from '@shared/ui/icon/icon';
+import { AuthService } from '@core/services/auth.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -12,4 +13,5 @@ import { Icon } from '@shared/ui/icon/icon';
 })
 export class AppShell {
   protected readonly navigationItems = NAVIGATION_ITEMS;
+  protected readonly auth = inject(AuthService);
 }

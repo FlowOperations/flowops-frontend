@@ -1,0 +1,103 @@
+<app-page-header title="Tarefas" description="Movimente cada atividade até a aprovação final.">
+  <button class="button button--primary" type="button" (click)="showForm.set(!showForm())">
+    Nova tarefa
+  </button>
+</app-page-header>
+
+<div class="toolbar toolbar--split">
+  <label
+    >Empresa<select [(ngModel)]="companyId" (ngModelChange)="loadProjects()">
+      @for (link of links(); track link.id) {
+        <option [ngValue]="link.empresaId">{{ link.empresaNome }}</option>
+      }
+    </select></label
+  >
+  <label
+    >Projeto<select [(ngModel)]="projectId" (ngModelChange)="loadTasks()">
+      @for (project of projects(); track project.id) {
+        <option [ngValue]="project.id">{{ project.nome }}</option>
+      }
+    </select></label
+  >
+</div>
+
+@if (feedback()) {
+  <div class="notice notice--error">{{ feedback() }}</div>
+}
+
+@if (showForm()) {
+  <form class="form-panel" (ngSubmit)="create()">
+    <div class="form-panel__header">
+      <div>
+        <h2>Nova tarefa</h2>
+        <p>Cadastre e atribua a atividade.</p>
+      </div>
+    </div>
+    <div class="form-grid">
+      <label>Título<input [(ngModel)]="title" name="title" required /></label>
+      <label>Descrição<input [(ngModel)]="description" name="description" required /></label>
+      <label
+        >Prioridade<select [(ngModel)]="priority" name="priority">
+          <option value="BAIXA">Baixa</option>
+          <option value="MEDIA">Média</option>
+          <option value="ALTA">Alta</option>
+          <option value="URGENTE">Urgente</option>
+        </select></label
+      >
+      <label
+        >Prazo<input [(ngModel)]="deadline" name="deadline" type="datetime-local" required
+      /></label>
+      <label
+        >ID do responsável<input
+          [(ngModel)]="responsibleId"
+          name="responsibleId"
+          type="number"
+          placeholder="Você será usado se vazio"
+      /></label>
+    </div>
+    <div class="form-actions">
+      <button class="button button--ghost" type="button" (click)="showForm.set(false)">
+        Cancelar</button
+      ><button class="button button--primary" type="submit">Criar tarefa</button>
+    </div>
+  </form>
+}
+
+<section class="kanban">
+  @for (
+    column of [
+      { status: 'PENDENTE', label: 'Pendente' },
+      { status: 'EM_ANDAMENTO', label: 'Em andamento' },
+      { status: 'AGUARDANDO_AUDITORIA', label: 'Em auditoria' },
+      { status: 'EM_CORRECAO', label: 'Correção' },
+      { status: 'APROVADA', label: 'Aprovada' },
+    ];
+    track column.status
+  ) {
+    <div class="kanban-column">
+      <header>
+        <strong>{{ column.label }}</strong
+        ><span>{{ tasksBy($any(column.status)).length }}</span>
+      </header>
+      @for (task of tasksBy($any(column.status)); track task.id) {
+        <article class="task-card">
+          <span class="priority-tag priority-tag--{{ task.prioridade.toLowerCase() }}">{{
+            task.prioridade
+          }}</span>
+          <h3>{{ task.titulo }}</h3>
+          <p>{{ task.descricao }}</p>
+          <small>{{ task.responsavelNome || 'Sem responsável' }}</small>
+          @if (actionLabel(task)) {
+            <button
+              class="button button--small button--secondary"
+              type="button"
+              (click)="advance(task)"
+            >
+              {{ actionLabel(task) }}
+            </button>
+          }
+        </article>
+      }
+    </div>
+  }
+</section>

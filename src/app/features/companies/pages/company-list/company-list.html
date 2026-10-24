@@ -1,10 +1,70 @@
 <app-page-header
   title="Empresas"
-  description="Encontre sua empresa e solicite acesso ao ambiente de trabalho."
-/>
+  [description]="
+    isAdmin()
+      ? 'Cadastre empresas e defina o primeiro gestor de cada operação.'
+      : 'Encontre sua empresa e solicite acesso ao ambiente de trabalho.'
+  "
+>
+  @if (isAdmin()) {
+    <button class="button button--primary" type="button" (click)="showForm.set(!showForm())">
+      Nova empresa
+    </button>
+  }
+</app-page-header>
 
 @if (feedback()) {
-  <div class="notice">{{ feedback() }}</div>
+  <div class="notice" [class.notice--error]="feedbackError()">{{ feedback() }}</div>
+}
+
+@if (isAdmin() && showForm()) {
+  <form class="form-panel" (ngSubmit)="create()">
+    <div class="form-panel__header">
+      <h2>Nova empresa</h2>
+      <p>Informe os dados empresariais e escolha o gestor responsável pelo acesso inicial.</p>
+    </div>
+    <div class="form-grid">
+      <label>
+        Razão social
+        <input [(ngModel)]="corporateName" name="corporateName" required />
+      </label>
+      <label>
+        Nome fantasia
+        <input [(ngModel)]="tradeName" name="tradeName" required />
+      </label>
+      <label>
+        CNPJ
+        <input
+          [(ngModel)]="cnpj"
+          name="cnpj"
+          inputmode="numeric"
+          maxlength="18"
+          placeholder="00.000.000/0000-00"
+          required
+        />
+      </label>
+      <label>
+        Gestor inicial
+        <select [(ngModel)]="managerId" name="managerId" required>
+          @for (user of users(); track user.id) {
+            <option [ngValue]="user.id">{{ user.nomeCompleto }} · {{ user.email }}</option>
+          }
+        </select>
+      </label>
+      <label>
+        Cargo do gestor
+        <input [(ngModel)]="managerRole" name="managerRole" required />
+      </label>
+    </div>
+    <div class="form-actions">
+      <button class="button button--ghost" type="button" (click)="showForm.set(false)">
+        Cancelar
+      </button>
+      <button class="button button--primary" type="submit" [disabled]="saving() || !managerId">
+        {{ saving() ? 'Cadastrando...' : 'Cadastrar empresa' }}
+      </button>
+    </div>
+  </form>
 }
 
 @if (loading()) {
@@ -18,11 +78,13 @@
           <span class="status status--active">Ativa</span>
           <h2>{{ company.nomeFantasia }}</h2>
           <p>{{ company.razaoSocial }}</p>
-          <small>CNPJ {{ company.cnpj }}</small>
+          <small>CNPJ {{ formatCnpj(company.cnpj) }}</small>
         </div>
-        <button class="button button--secondary" type="button" (click)="requestAccess(company)">
-          Solicitar acesso
-        </button>
+        @if (!isAdmin()) {
+          <button class="button button--secondary" type="button" (click)="requestAccess(company)">
+            Solicitar acesso
+          </button>
+        }
       </article>
     } @empty {
       <div class="state-card">Nenhuma empresa disponível no momento.</div>

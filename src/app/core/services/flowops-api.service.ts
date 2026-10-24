@@ -7,6 +7,7 @@ import {
   Projeto,
   StatusProjeto,
   Tarefa,
+  Usuario,
   VinculoEmpresa,
 } from '@core/models/api.models';
 import { Observable } from 'rxjs';
@@ -17,6 +18,21 @@ export class FlowOpsApiService {
 
   listarEmpresas(): Observable<Empresa[]> {
     return this.http.get<Empresa[]>('/api/empresas');
+  }
+
+  criarEmpresa(payload: {
+    razaoSocial: string;
+    nomeFantasia: string;
+    cnpj: string;
+    flgAtivo: boolean;
+    gestorInicialId: number;
+    cargoGestor: string;
+  }): Observable<Empresa> {
+    return this.http.post<Empresa>('/api/empresas', payload);
+  }
+
+  listarUsuarios(): Observable<Usuario[]> {
+    return this.http.get<Usuario[]>('/api/usuarios');
   }
 
   solicitarVinculo(empresaId: number): Observable<VinculoEmpresa> {

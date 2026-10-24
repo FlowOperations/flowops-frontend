@@ -10,13 +10,14 @@ export class AuthService {
   private readonly router = inject(Router);
   private readonly tokenKey = 'flowops_token';
   private readonly userKey = 'flowops_user';
+  private readonly currentToken = signal<string | null>(localStorage.getItem(this.tokenKey));
   private readonly currentUser = signal<Usuario | null>(this.readUser());
 
   readonly user = this.currentUser.asReadonly();
-  readonly authenticated = computed(() => Boolean(this.token && this.currentUser()));
+  readonly authenticated = computed(() => Boolean(this.currentToken() && this.currentUser()));
 
   get token(): string | null {
-    return localStorage.getItem(this.tokenKey);
+    return this.currentToken();
   }
 
   login(cpf: string, senha: string): Observable<AuthResponse> {
@@ -24,6 +25,7 @@ export class AuthService {
       tap((response) => {
         localStorage.setItem(this.tokenKey, response.token);
         localStorage.setItem(this.userKey, JSON.stringify(response.usuario));
+        this.currentToken.set(response.token);
         this.currentUser.set(response.usuario);
       }),
     );
@@ -36,6 +38,7 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.userKey);
+    this.currentToken.set(null);
     this.currentUser.set(null);
     void this.router.navigate(['/login']);
   }

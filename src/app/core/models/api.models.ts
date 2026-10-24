@@ -18,7 +18,7 @@ export interface Usuario {
 export interface AuthResponse {
   token: string;
   tipo: string;
-  expiracaoSegundos: number;
+  expiraEmSegundos: number;
   usuario: Usuario;
 }
 

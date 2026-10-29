@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
 import { apiErrorMessage } from '@core/utils/api-error.util';
+import { ThemeToggle } from '@shared/ui/theme-toggle/theme-toggle';
 import { finalize } from 'rxjs';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, ThemeToggle],
   selector: 'app-login',
   styleUrl: './login.scss',
   templateUrl: './login.html',

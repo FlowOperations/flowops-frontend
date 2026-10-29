@@ -92,9 +92,9 @@
 .workspace-card__avatar,
 .profile-avatar {
   align-items: center;
-  background: #d9e6ff;
+  background: var(--color-primary-soft);
   border-radius: 9px;
-  color: #244b9b;
+  color: var(--color-primary-ink);
   display: inline-flex;
   font-size: 12px;
   font-weight: 750;
@@ -117,12 +117,16 @@
 
 .topbar {
   align-items: center;
-  background: rgb(255 255 255 / 92%);
+  backdrop-filter: blur(14px);
+  background: var(--color-topbar);
   border-bottom: 1px solid var(--color-border);
   display: flex;
   height: 72px;
   justify-content: space-between;
   padding: 0 28px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
 }
 
 .topbar__context {

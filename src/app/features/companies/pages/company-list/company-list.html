@@ -7,7 +7,7 @@
   "
 >
   @if (isAdmin()) {
-    <button class="button button--primary" type="button" (click)="showForm.set(!showForm())">
+    <button class="button button--primary" type="button" (click)="toggleForm()">
       Nova empresa
     </button>
   }
@@ -26,40 +26,96 @@
     <div class="form-grid">
       <label>
         Razão social
-        <input [(ngModel)]="corporateName" name="corporateName" required />
+        <input
+          id="company-corporate-name"
+          [(ngModel)]="corporateName"
+          name="corporateName"
+          required
+          [class.field-control--invalid]="fieldError('razaoSocial')"
+          [attr.aria-invalid]="fieldError('razaoSocial') ? 'true' : null"
+          [attr.aria-describedby]="
+            fieldError('razaoSocial') ? 'company-corporate-name-error' : null
+          "
+          (ngModelChange)="clearFieldError('razaoSocial')"
+        />
+        @if (fieldError('razaoSocial'); as error) {
+          <small class="field-error" id="company-corporate-name-error">{{ error }}</small>
+        }
       </label>
       <label>
         Nome fantasia
-        <input [(ngModel)]="tradeName" name="tradeName" required />
+        <input
+          id="company-trade-name"
+          [(ngModel)]="tradeName"
+          name="tradeName"
+          required
+          [class.field-control--invalid]="fieldError('nomeFantasia')"
+          [attr.aria-invalid]="fieldError('nomeFantasia') ? 'true' : null"
+          [attr.aria-describedby]="fieldError('nomeFantasia') ? 'company-trade-name-error' : null"
+          (ngModelChange)="clearFieldError('nomeFantasia')"
+        />
+        @if (fieldError('nomeFantasia'); as error) {
+          <small class="field-error" id="company-trade-name-error">{{ error }}</small>
+        }
       </label>
       <label>
         CNPJ
         <input
+          id="company-cnpj"
           [(ngModel)]="cnpj"
           name="cnpj"
           inputmode="numeric"
           maxlength="18"
           placeholder="00.000.000/0000-00"
           required
+          [class.field-control--invalid]="fieldError('cnpj')"
+          [attr.aria-invalid]="fieldError('cnpj') ? 'true' : null"
+          [attr.aria-describedby]="fieldError('cnpj') ? 'company-cnpj-error' : null"
+          (ngModelChange)="clearFieldError('cnpj')"
         />
+        @if (fieldError('cnpj'); as error) {
+          <small class="field-error" id="company-cnpj-error">{{ error }}</small>
+        }
       </label>
       <label>
         Gestor inicial
-        <select [(ngModel)]="managerId" name="managerId" required>
+        <select
+          id="company-manager"
+          [(ngModel)]="managerId"
+          name="managerId"
+          required
+          [class.field-control--invalid]="fieldError('gestorInicialId')"
+          [attr.aria-invalid]="fieldError('gestorInicialId') ? 'true' : null"
+          [attr.aria-describedby]="fieldError('gestorInicialId') ? 'company-manager-error' : null"
+          (ngModelChange)="clearFieldError('gestorInicialId')"
+        >
           @for (user of users(); track user.id) {
             <option [ngValue]="user.id">{{ user.nomeCompleto }} · {{ user.email }}</option>
           }
         </select>
+        @if (fieldError('gestorInicialId'); as error) {
+          <small class="field-error" id="company-manager-error">{{ error }}</small>
+        }
       </label>
       <label>
         Cargo do gestor
-        <input [(ngModel)]="managerRole" name="managerRole" required />
+        <input
+          id="company-manager-role"
+          [(ngModel)]="managerRole"
+          name="managerRole"
+          required
+          [class.field-control--invalid]="fieldError('cargoGestor')"
+          [attr.aria-invalid]="fieldError('cargoGestor') ? 'true' : null"
+          [attr.aria-describedby]="fieldError('cargoGestor') ? 'company-manager-role-error' : null"
+          (ngModelChange)="clearFieldError('cargoGestor')"
+        />
+        @if (fieldError('cargoGestor'); as error) {
+          <small class="field-error" id="company-manager-role-error">{{ error }}</small>
+        }
       </label>
     </div>
     <div class="form-actions">
-      <button class="button button--ghost" type="button" (click)="showForm.set(false)">
-        Cancelar
-      </button>
+      <button class="button button--ghost" type="button" (click)="cancelCreate()">Cancelar</button>
       <button class="button button--primary" type="submit" [disabled]="saving() || !managerId">
         {{ saving() ? 'Cadastrando...' : 'Cadastrar empresa' }}
       </button>

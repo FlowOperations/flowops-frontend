@@ -11,3 +11,10 @@ export const guestGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   return auth.authenticated() ? inject(Router).createUrlTree(['/dashboard']) : true;
 };
+
+export const adminGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  return auth.user()?.perfilSistema === 'ADMIN_FLOWOPS'
+    ? true
+    : inject(Router).createUrlTree(['/dashboard']);
+};

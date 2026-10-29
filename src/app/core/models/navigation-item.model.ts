@@ -4,4 +4,5 @@ export interface NavigationItem {
   label: string;
   route: string;
   icon: IconName;
+  adminOnly?: boolean;
 }

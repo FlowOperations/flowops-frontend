@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard, guestGuard } from '@core/guards/auth.guard';
+import { adminGuard, authGuard, guestGuard } from '@core/guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -37,6 +37,15 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/companies/pages/company-list/company-list').then(
             (component) => component.CompanyList,
+          ),
+      },
+      {
+        path: 'usuarios',
+        canActivate: [adminGuard],
+        title: 'Usuários | FlowOps',
+        loadComponent: () =>
+          import('./features/users/pages/user-list/user-list').then(
+            (component) => component.UserList,
           ),
       },
       {

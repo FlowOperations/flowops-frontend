@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
-export type IconName = 'overview' | 'company' | 'project' | 'task' | 'audit';
+export type IconName = 'overview' | 'company' | 'users' | 'project' | 'task' | 'audit';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,5 +1,6 @@
 export type PerfilSistema = 'ADMIN_FLOWOPS' | 'USUARIO';
 export type PapelEmpresa = 'GESTOR' | 'COORDENADOR' | 'FUNCIONARIO';
+export type TipoAcessoUsuario = 'ADMIN_FLOWOPS' | PapelEmpresa;
 export type StatusProjeto = 'PLANEJAMENTO' | 'EM_ANDAMENTO' | 'PAUSADO' | 'CONCLUIDO' | 'CANCELADO';
 export type PrioridadeTarefa = 'BAIXA' | 'MEDIA' | 'ALTA' | 'URGENTE';
 export type StatusTarefa =
@@ -28,6 +29,24 @@ export interface CadastroUsuario {
   email: string;
   senha: string;
   dataNascimento: string;
+}
+
+export interface AcessoUsuario {
+  empresaId: number;
+  empresaNome: string;
+  papel: PapelEmpresa;
+  cargo: string;
+}
+
+export interface UsuarioAdministracao extends Usuario {
+  acessos: AcessoUsuario[];
+}
+
+export interface CadastroUsuarioAdmin extends CadastroUsuario {
+  tipoAcesso: TipoAcessoUsuario;
+  empresaId: number | null;
+  cargo: string | null;
+  projetoIds: number[];
 }
 
 export interface Empresa {
@@ -93,4 +112,5 @@ export interface Auditoria {
 export interface ApiError {
   mensagem?: string;
   message?: string;
+  campos?: Record<string, string>;
 }

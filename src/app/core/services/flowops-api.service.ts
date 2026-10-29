@@ -2,12 +2,14 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import {
   Auditoria,
+  CadastroUsuarioAdmin,
   Empresa,
   PrioridadeTarefa,
   Projeto,
   StatusProjeto,
   Tarefa,
   Usuario,
+  UsuarioAdministracao,
   VinculoEmpresa,
 } from '@core/models/api.models';
 import { Observable } from 'rxjs';
@@ -33,6 +35,14 @@ export class FlowOpsApiService {
 
   listarUsuarios(): Observable<Usuario[]> {
     return this.http.get<Usuario[]>('/api/usuarios');
+  }
+
+  listarUsuariosAdministracao(): Observable<UsuarioAdministracao[]> {
+    return this.http.get<UsuarioAdministracao[]>('/api/usuarios/administracao');
+  }
+
+  criarUsuarioAdministrativamente(payload: CadastroUsuarioAdmin): Observable<UsuarioAdministracao> {
+    return this.http.post<UsuarioAdministracao>('/api/usuarios/administracao', payload);
   }
 
   solicitarVinculo(empresaId: number): Observable<VinculoEmpresa> {

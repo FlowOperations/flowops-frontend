@@ -1,0 +1,143 @@
+<app-page-header title="Usuários" description="Cadastre pessoas e defina seus acessos ao FlowOps.">
+  <button class="button button--primary" type="button" (click)="toggleForm()">Novo usuário</button>
+</app-page-header>
+
+@if (feedback()) {
+  <div class="notice" [class.notice--error]="feedbackError()">{{ feedback() }}</div>
+}
+
+@if (showForm()) {
+  <form class="form-panel" (ngSubmit)="create()">
+    <div class="form-panel__header">
+      <h2>Novo usuário</h2>
+      <p>Informe os dados pessoais e escolha o nível de acesso inicial.</p>
+    </div>
+
+    <div class="form-grid">
+      <label>
+        Nome completo
+        <input id="user-name" [(ngModel)]="name" name="name" required />
+      </label>
+      <label>
+        CPF
+        <input
+          id="user-cpf"
+          [(ngModel)]="cpf"
+          name="cpf"
+          inputmode="numeric"
+          maxlength="14"
+          placeholder="000.000.000-00"
+          required
+        />
+      </label>
+      <label>
+        E-mail
+        <input id="user-email" [(ngModel)]="email" name="email" type="email" required />
+      </label>
+      <label>
+        Data de nascimento
+        <input id="user-birth-date" [(ngModel)]="birthDate" name="birthDate" type="date" required />
+      </label>
+      <label>
+        Senha inicial
+        <input
+          id="user-password"
+          [(ngModel)]="password"
+          name="password"
+          type="password"
+          minlength="8"
+          maxlength="72"
+          required
+        />
+      </label>
+      <label>
+        Tipo de acesso
+        <select
+          id="user-access-type"
+          [(ngModel)]="accessType"
+          name="accessType"
+          (ngModelChange)="onAccessTypeChange()"
+          required
+        >
+          @for (type of accessTypes; track type.value) {
+            <option [value]="type.value">{{ type.label }}</option>
+          }
+        </select>
+      </label>
+
+      @if (businessAccess()) {
+        <label>
+          Empresa
+          <select
+            id="user-company"
+            [(ngModel)]="companyId"
+            name="companyId"
+            (ngModelChange)="loadProjects()"
+            required
+          >
+            @for (company of companies(); track company.id) {
+              <option [ngValue]="company.id">{{ company.nomeFantasia }}</option>
+            }
+          </select>
+        </label>
+        <label>
+          Cargo
+          <input id="user-role" [(ngModel)]="role" name="role" required />
+        </label>
+      }
+    </div>
+
+    @if (projectAccess()) {
+      <fieldset class="project-access">
+        <legend>Projetos permitidos</legend>
+        <p>Selecione os projetos que este usuário poderá acessar.</p>
+        <div class="project-access__grid">
+          @for (project of projects(); track project.id) {
+            <label>
+              <input
+                id="user-project-{{ project.id }}"
+                type="checkbox"
+                [checked]="projectIds.includes(project.id)"
+                (change)="toggleProject(project.id, $any($event.target).checked)"
+              />
+              <span>{{ project.nome }}</span>
+            </label>
+          } @empty {
+            <small>Nenhum projeto disponível para esta empresa.</small>
+          }
+        </div>
+      </fieldset>
+    }
+
+    <div class="form-actions">
+      <button class="button button--ghost" type="button" (click)="toggleForm()">Cancelar</button>
+      <button class="button button--primary" type="submit" [disabled]="saving()">
+        {{ saving() ? 'Cadastrando...' : 'Cadastrar usuário' }}
+      </button>
+    </div>
+  </form>
+}
+
+@if (loading()) {
+  <div class="state-card">Carregando usuários...</div>
+} @else {
+  <section class="table-card user-table">
+    <div class="table-row table-row--header">
+      <span>Usuário</span><span>CPF</span><span>Acesso</span><span>Empresa</span><span>Status</span>
+    </div>
+    @for (user of users(); track user.id) {
+      <div class="table-row">
+        <span
+          ><strong>{{ user.nomeCompleto }}</strong
+          ><small>{{ user.email }}</small></span
+        >
+        <span>{{ formatCpf(user.cpf) }}</span>
+        <span>{{ accessLabel(user) }}</span>
+        <span>{{ companyLabel(user) }}</span>
+        <span><span class="status status--active">Ativo</span></span>
+      </div>
+    } @empty {
+      <div class="state-card">Nenhum usuário ativo encontrado.</div>
+    }
+  </section>
+}

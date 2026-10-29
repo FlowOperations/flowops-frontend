@@ -67,10 +67,17 @@
 
 .login-form-area {
   align-items: center;
-  background: #f7f9fc;
+  background: var(--color-bg);
   display: flex;
   justify-content: center;
   padding: 32px;
+  position: relative;
+  transition: background 180ms ease;
+}
+.login-form-area > app-theme-toggle {
+  position: absolute;
+  right: 28px;
+  top: 28px;
 }
 .login-card {
   display: grid;
@@ -91,7 +98,7 @@
   margin: 0;
 }
 .login-card label {
-  color: #344054;
+  color: var(--color-text-label);
   display: grid;
   font-size: 13px;
   font-weight: 650;
@@ -136,6 +143,10 @@
 @media (max-width: 520px) {
   .login-form-area {
     padding: 24px;
+  }
+  .login-form-area > app-theme-toggle {
+    right: 20px;
+    top: 20px;
   }
   .auth-form-grid {
     grid-template-columns: 1fr;

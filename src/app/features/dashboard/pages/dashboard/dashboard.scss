@@ -125,29 +125,29 @@
 }
 
 .priority--high {
-  background: #fee4e2;
-  color: #b42318;
+  background: var(--color-danger-bg);
+  color: var(--color-danger-text);
 }
 .priority--medium {
-  background: #fff0d5;
-  color: #b15d00;
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
 }
 .priority--low {
-  background: #e1f5ee;
-  color: #087a66;
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
 }
 .priority--alta,
 .priority--urgente {
-  background: #fee4e2;
-  color: #b42318;
+  background: var(--color-danger-bg);
+  color: var(--color-danger-text);
 }
 .priority--media {
-  background: #fff0d5;
-  color: #b15d00;
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
 }
 .priority--baixa {
-  background: #e1f5ee;
-  color: #087a66;
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
 }
 .dashboard-empty {
   color: var(--color-text-muted);

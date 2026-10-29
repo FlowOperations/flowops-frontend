@@ -7,7 +7,7 @@
 
     <nav class="navigation" aria-label="Navegação principal">
       <span class="navigation__label">Workspace</span>
-      @for (item of navigationItems; track item.route) {
+      @for (item of navigationItems(); track item.route) {
         <a
           class="navigation__item"
           [routerLink]="item.route"
@@ -39,6 +39,7 @@
         <strong>Visão operacional</strong>
       </div>
       <div class="topbar__profile">
+        <app-theme-toggle />
         <span class="profile-avatar">{{ auth.initials() }}</span>
         <span class="profile-copy"
           ><strong>{{ auth.user()?.nomeCompleto }}</strong

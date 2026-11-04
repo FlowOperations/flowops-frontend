@@ -1,6 +1,6 @@
 <div class="shell">
   <aside class="sidebar">
-    <a class="brand" routerLink="/dashboard">
+    <a class="brand" routerLink="/dashboard" aria-label="FlowOps — Visão geral">
       <span class="brand__mark"><img src="/assets/flowops-logo.png" alt="" /></span>
       <span class="brand__name">Flow<span>Ops</span></span>
     </a>
@@ -11,7 +11,10 @@
         <a
           class="navigation__item"
           [routerLink]="item.route"
+          [attr.aria-label]="item.label"
+          [attr.title]="item.label"
           routerLinkActive="navigation__item--active"
+          ariaCurrentWhenActive="page"
         >
           <app-icon [name]="item.icon" [size]="19" />
           <span>{{ item.label }}</span>

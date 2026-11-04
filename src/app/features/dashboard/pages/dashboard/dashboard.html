@@ -1,6 +1,29 @@
+<section class="overview-banner" aria-labelledby="overview-title">
+  <div class="overview-banner__copy">
+    <span class="overview-banner__eyebrow">SEU CENTRO DE OPERAÇÕES</span>
+    <h2 id="overview-title">Tudo conectado.<br /><span>Seu trabalho em movimento.</span></h2>
+    <p>
+      Projetos, pessoas e entregas em um só lugar. Acompanhe o que importa e dê o próximo passo.
+    </p>
+    <div class="overview-banner__actions">
+      <a class="button" routerLink="/projetos"
+        >Explorar projetos <span aria-hidden="true">↗</span></a
+      >
+      <a class="overview-banner__link" routerLink="/tarefas"
+        >Ver tarefas <span aria-hidden="true">→</span></a
+      >
+    </div>
+  </div>
+  <div class="overview-banner__visual" aria-hidden="true">
+    <app-icon name="project" [size]="36" />
+    <app-icon name="task" [size]="36" />
+    <app-icon name="audit" [size]="36" />
+  </div>
+</section>
+
 <app-page-header
   title="Visão geral"
-  description="Acompanhe operações, entregas e pontos que exigem atenção."
+  description="Os principais números da sua operação, em tempo real."
 />
 
 @if (feedback()) {
@@ -9,20 +32,31 @@
 
 <section class="indicators" aria-label="Indicadores">
   <article class="indicator-card">
-    <span>Projetos ativos</span><strong>{{ activeProjects() }}</strong
-    ><small>{{ projects().length }} projetos visíveis</small>
+    <div class="indicator-card__top"><span>Projetos ativos</span><app-icon name="project" /></div>
+    <strong>{{ activeProjects() }}</strong
+    ><small
+      >{{ projects().length }}
+      {{ projects().length === 1 ? 'projeto visível' : 'projetos visíveis' }}</small
+    >
   </article>
   <article class="indicator-card">
-    <span>Tarefas em andamento</span><strong>{{ runningTasks() }}</strong
-    ><small>{{ tasks().length }} tarefas no total</small>
+    <div class="indicator-card__top"><span>Tarefas em andamento</span><app-icon name="task" /></div>
+    <strong>{{ runningTasks() }}</strong
+    ><small
+      >{{ tasks().length }}
+      {{ tasks().length === 1 ? 'tarefa no total' : 'tarefas no total' }}</small
+    >
   </article>
   <article class="indicator-card">
-    <span>Aguardando auditoria</span><strong>{{ auditCount() }}</strong
+    <div class="indicator-card__top">
+      <span>Aguardando auditoria</span><app-icon name="audit" />
+    </div>
+    <strong>{{ auditCount() }}</strong
     ><small>Itens disponíveis para revisão</small>
   </article>
   <article class="indicator-card">
-    <span>Progresso médio</span><strong>{{ averageProgress() }}%</strong
-    ><small>Todos os projetos acessíveis</small>
+    <div class="indicator-card__top"><span>Progresso médio</span><app-icon name="overview" /></div>
+    <strong>{{ averageProgress() }}%</strong><small>Todos os projetos acessíveis</small>
   </article>
 </section>
 
@@ -30,7 +64,7 @@
   <article class="panel panel--wide">
     <header>
       <div><strong>Projetos recentes</strong><small>Visão consolidada do andamento</small></div>
-      <span>{{ projects().length }} projetos</span>
+      <a class="panel__link" routerLink="/projetos">Ver todos →</a>
     </header>
     @for (project of projects().slice(0, 6); track project.id) {
       <div class="project-row">

@@ -1,14 +1,16 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { Projeto, Tarefa } from '@core/models/api.models';
 import { FlowOpsApiService } from '@core/services/flowops-api.service';
 import { apiErrorMessage } from '@core/utils/api-error.util';
 import { PageHeader } from '@shared/ui/page-header/page-header';
+import { Icon } from '@shared/ui/icon/icon';
 import { forkJoin, of, switchMap } from 'rxjs';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [PageHeader],
+  imports: [PageHeader, RouterLink, Icon],
   selector: 'app-dashboard',
   styleUrl: './dashboard.scss',
   templateUrl: './dashboard.html',

@@ -34,3 +34,6 @@ __screenshots__/
 
 .DS_Store
 Thumbs.db
+
+# Local Markdown documentation
+*.[mM][dD]

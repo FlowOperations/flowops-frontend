@@ -1,15 +1,20 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PrioridadeTarefa, Projeto, Tarefa, VinculoEmpresa } from '@core/models/api.models';
 import { AuthService } from '@core/services/auth.service';
 import { FlowOpsApiService } from '@core/services/flowops-api.service';
 import { apiErrorMessage } from '@core/utils/api-error.util';
 import { PageHeader } from '@shared/ui/page-header/page-header';
+import { initials, priorityLabels } from '@shared/ui/data-grid/list-display';
+import { matchesGridSearch } from '@shared/ui/data-grid/data-grid';
+import { FilterMenu } from '@shared/ui/filter-menu/filter-menu';
+import { Subscription } from 'rxjs';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, PageHeader],
+  imports: [FormsModule, PageHeader, DatePipe, FilterMenu],
   selector: 'app-task-board',
   templateUrl: './task-board.html',
 })
@@ -19,8 +24,36 @@ export class TaskBoard {
   protected readonly links = signal<VinculoEmpresa[]>([]);
   protected readonly projects = signal<Projeto[]>([]);
   protected readonly tasks = signal<Tarefa[]>([]);
+  protected readonly query = signal('');
+  protected readonly companyOptions = computed(() =>
+    this.links().map(({ empresaId, empresaNome }) => ({ value: empresaId, label: empresaNome })),
+  );
+  protected readonly projectOptions = computed(() =>
+    this.projects().map(({ id, nome }) => ({ value: id, label: nome })),
+  );
+  protected readonly visibleTasks = computed(() =>
+    this.tasks().filter((task) =>
+      matchesGridSearch(this.query(), [
+        task.titulo,
+        task.descricao,
+        task.responsavelNome,
+        'FO-' + task.id,
+      ]),
+    ),
+  );
+  private projectRequest?: Subscription;
+  private taskRequest?: Subscription;
   protected readonly showForm = signal(false);
   protected readonly feedback = signal('');
+  protected readonly initials = initials;
+  protected readonly priorityLabels = priorityLabels;
+  protected readonly columns: readonly { status: Tarefa['status']; label: string }[] = [
+    { status: 'PENDENTE', label: 'Pendente' },
+    { status: 'EM_ANDAMENTO', label: 'Em andamento' },
+    { status: 'AGUARDANDO_AUDITORIA', label: 'Em auditoria' },
+    { status: 'EM_CORRECAO', label: 'Correção' },
+    { status: 'APROVADA', label: 'Aprovada' },
+  ];
   protected companyId: number | null = null;
   protected projectId: number | null = null;
   protected title = '';
@@ -41,8 +74,12 @@ export class TaskBoard {
   }
 
   protected loadProjects(): void {
+    this.projectRequest?.unsubscribe();
+    this.projectId = null;
+    this.projects.set([]);
+    this.loadTasks();
     if (!this.companyId) return;
-    this.api.listarProjetos(this.companyId).subscribe({
+    this.projectRequest = this.api.listarProjetos(this.companyId).subscribe({
       next: (projects) => {
         this.projects.set(projects);
         this.projectId = projects[0]?.id ?? null;
@@ -53,11 +90,12 @@ export class TaskBoard {
   }
 
   protected loadTasks(): void {
+    this.taskRequest?.unsubscribe();
+    this.tasks.set([]);
     if (!this.projectId) {
-      this.tasks.set([]);
       return;
     }
-    this.api.listarTarefas(this.projectId).subscribe({
+    this.taskRequest = this.api.listarTarefas(this.projectId).subscribe({
       next: (tasks) => this.tasks.set(tasks),
       error: (response: HttpErrorResponse) => this.feedback.set(apiErrorMessage(response)),
     });
@@ -102,7 +140,7 @@ export class TaskBoard {
   }
 
   protected tasksBy(status: Tarefa['status']): Tarefa[] {
-    return this.tasks().filter((task) => task.status === status);
+    return this.visibleTasks().filter((task) => task.status === status);
   }
 
   private resetForm(): void {

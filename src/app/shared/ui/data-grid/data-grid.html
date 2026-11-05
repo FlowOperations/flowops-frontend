@@ -1,0 +1,94 @@
+<section class="data-grid" [attr.aria-label]="title()" [attr.aria-busy]="loading()">
+  <div class="grid-toolbar">
+    <label class="grid-search">
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+      >
+        <circle cx="10.5" cy="10.5" r="6.5" />
+        <path d="m16 16 4 4" />
+      </svg>
+      <input
+        #searchInput
+        type="search"
+        [attr.aria-label]="'Buscar em ' + title()"
+        [placeholder]="placeholder()"
+        [value]="query()"
+        (input)="updateQuery(searchInput.value)"
+      />
+    </label>
+    <div class="grid-filters">
+      <ng-content select="[grid-filter]" />
+      @if (searchScopes().length) {
+        <app-filter-menu
+          label="Campo"
+          [value]="scope()"
+          [options]="[{ value: '', label: 'Todos' }, ...searchScopes()]"
+          (valueChange)="updateScope($event)"
+        />
+      }
+      @for (filter of filters(); track filter.key) {
+        <app-filter-menu
+          [label]="filter.label"
+          [value]="selections()[filter.key] ?? ''"
+          [options]="[{ value: '', label: filter.allLabel }, ...filter.options]"
+          (valueChange)="updateFilter(filter.key, $event)"
+        />
+      }
+      <app-filter-menu
+        label="Ordenar"
+        [value]="order()"
+        [options]="sortOptions"
+        (valueChange)="updateOrder($event)"
+      />
+      @if (hasFilters()) {
+        <button class="grid-clear" type="button" (click)="clear()">Limpar filtros</button>
+      }
+    </div>
+  </div>
+  <div class="grid-scroll" tabindex="0" role="region" [attr.aria-label]="'Tabela de ' + title()">
+    <table [attr.aria-label]="title()">
+      <ng-content select="thead" />
+      <ng-content select="tbody" />
+    </table>
+  </div>
+  @if (loading()) {
+    <p class="grid-state" role="status">Carregando registros…</p>
+  } @else if (!filteredItems().length) {
+    <p class="grid-state" role="status">
+      {{
+        hasFilters() && items().length
+          ? 'Nenhum resultado para os filtros selecionados.'
+          : emptyText()
+      }}
+    </p>
+  }
+  <footer class="grid-footer">
+    <span role="status">
+      @if (visibleItems().length) {
+        {{ offset() + 1 }}–{{ offset() + visibleItems().length }} de {{ filteredItems().length }}
+      } @else {
+        0 resultados
+      }
+    </span>
+    <div class="grid-pagination">
+      <app-filter-menu
+        label="Por página"
+        [value]="pageSize()"
+        [options]="pageSizes"
+        [alignEnd]="true"
+        [dropUp]="true"
+        (valueChange)="updatePageSize($event)"
+      />
+      <button type="button" (click)="page.set(page() - 1)" [disabled]="page() === 0">
+        ‹ Anterior
+      </button>
+      <button type="button" (click)="page.set(page() + 1)" [disabled]="page() >= pageCount() - 1">
+        Próxima ›
+      </button>
+    </div>
+  </footer>
+</section>

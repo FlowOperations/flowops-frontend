@@ -123,27 +123,54 @@
   </form>
 }
 
-@if (loading()) {
-  <div class="state-card">Carregando empresas...</div>
-} @else {
-  <section class="card-grid">
-    @for (company of companies(); track company.id) {
-      <article class="entity-card">
-        <div class="entity-card__icon">{{ company.nomeFantasia.slice(0, 2).toUpperCase() }}</div>
-        <div class="entity-card__content">
-          <span class="status status--active">Ativa</span>
-          <h2>{{ company.nomeFantasia }}</h2>
-          <p>{{ company.razaoSocial }}</p>
-          <small>CNPJ {{ formatCnpj(company.cnpj) }}</small>
-        </div>
+<app-data-grid
+  #grid
+  title="Empresas"
+  placeholder="Buscar por nome ou CNPJ"
+  emptyText="Nenhuma empresa disponível no momento."
+  [items]="companies()"
+  [loading]="loading()"
+  [searchFields]="companyFields"
+  [searchScopes]="companyScopes"
+  [scopedSearchFields]="scopedFields"
+  [sortName]="companyName"
+>
+  <thead>
+    <tr>
+      <th scope="col">Empresa</th>
+      <th scope="col">CNPJ</th>
+      <th scope="col">Status</th>
+      @if (!isAdmin()) {
+        <th scope="col" class="grid-actions">Ações</th>
+      }
+    </tr>
+  </thead>
+  <tbody>
+    @for (company of grid.visibleItems(); track company.id) {
+      <tr>
+        <td>
+          <div class="grid-identity">
+            <span class="grid-avatar" aria-hidden="true">{{ initials(company.nomeFantasia) }}</span>
+            <div>
+              <strong>{{ company.nomeFantasia }}</strong
+              ><small>{{ company.razaoSocial }}</small>
+            </div>
+          </div>
+        </td>
+        <td class="grid-number">{{ formatCnpj(company.cnpj) }}</td>
+        <td><span class="status status--active">Ativa</span></td>
         @if (!isAdmin()) {
-          <button class="button button--secondary" type="button" (click)="requestAccess(company)">
-            Solicitar acesso
-          </button>
+          <td class="grid-actions">
+            <button
+              class="button button--small button--secondary"
+              type="button"
+              (click)="requestAccess(company)"
+            >
+              Solicitar acesso
+            </button>
+          </td>
         }
-      </article>
-    } @empty {
-      <div class="state-card">Nenhuma empresa disponível no momento.</div>
+      </tr>
     }
-  </section>
-}
+  </tbody>
+</app-data-grid>

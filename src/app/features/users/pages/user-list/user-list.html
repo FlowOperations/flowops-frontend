@@ -118,26 +118,47 @@
   </form>
 }
 
-@if (loading()) {
-  <div class="state-card">Carregando usuários...</div>
-} @else {
-  <section class="table-card user-table">
-    <div class="table-row table-row--header">
-      <span>Usuário</span><span>CPF</span><span>Acesso</span><span>Empresa</span><span>Status</span>
-    </div>
-    @for (user of users(); track user.id) {
-      <div class="table-row">
-        <span
-          ><strong>{{ user.nomeCompleto }}</strong
-          ><small>{{ user.email }}</small></span
-        >
-        <span>{{ formatCpf(user.cpf) }}</span>
-        <span>{{ accessLabel(user) }}</span>
-        <span>{{ companyLabel(user) }}</span>
-        <span><span class="status status--active">Ativo</span></span>
-      </div>
-    } @empty {
-      <div class="state-card">Nenhum usuário ativo encontrado.</div>
+<app-data-grid
+  #grid
+  title="Usuários"
+  placeholder="Buscar por nome, e-mail ou CPF"
+  emptyText="Nenhum usuário ativo encontrado."
+  [items]="users()"
+  [loading]="loading()"
+  [searchFields]="userFields"
+  [sortName]="userName"
+  [filters]="userFilters()"
+>
+  <thead>
+    <tr>
+      <th scope="col">Usuário</th>
+      <th scope="col">CPF</th>
+      <th scope="col">Acesso</th>
+      <th scope="col">Empresa</th>
+      <th scope="col">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (user of grid.visibleItems(); track user.id) {
+      <tr>
+        <td>
+          <div class="grid-identity">
+            <span class="grid-avatar" aria-hidden="true">{{ initials(user.nomeCompleto) }}</span>
+            <div>
+              <strong>{{ user.nomeCompleto }}</strong
+              ><small>{{ user.email }}</small>
+            </div>
+          </div>
+        </td>
+        <td class="grid-number">{{ formatCpf(user.cpf) }}</td>
+        <td>{{ accessLabel(user) }}</td>
+        <td>{{ companyLabel(user) }}</td>
+        <td>
+          <span class="status" [class.status--active]="user.ativo">{{
+            user.ativo ? 'Ativo' : 'Inativo'
+          }}</span>
+        </td>
+      </tr>
     }
-  </section>
-}
+  </tbody>
+</app-data-grid>

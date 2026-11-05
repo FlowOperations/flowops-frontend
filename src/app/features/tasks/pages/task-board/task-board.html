@@ -4,21 +4,27 @@
   </button>
 </app-page-header>
 
-<div class="toolbar toolbar--split">
-  <label
-    >Empresa<select [(ngModel)]="companyId" (ngModelChange)="loadProjects()">
-      @for (link of links(); track link.id) {
-        <option [ngValue]="link.empresaId">{{ link.empresaNome }}</option>
-      }
-    </select></label
-  >
-  <label
-    >Projeto<select [(ngModel)]="projectId" (ngModelChange)="loadTasks()">
-      @for (project of projects(); track project.id) {
-        <option [ngValue]="project.id">{{ project.nome }}</option>
-      }
-    </select></label
-  >
+<div class="board-toolbar" aria-label="Filtros do quadro">
+  <app-filter-menu
+    label="Empresa"
+    [value]="companyId"
+    [options]="companyOptions()"
+    (valueChange)="companyId = $event; loadProjects()"
+  />
+  <app-filter-menu
+    label="Projeto"
+    [value]="projectId"
+    [options]="projectOptions()"
+    (valueChange)="projectId = $event; loadTasks()"
+  />
+  <input
+    #taskSearch
+    type="search"
+    aria-label="Buscar tarefas"
+    placeholder="Buscar no quadro…"
+    [value]="query()"
+    (input)="query.set(taskSearch.value)"
+  />
 </div>
 
 @if (feedback()) {
@@ -63,30 +69,54 @@
   </form>
 }
 
-<section class="kanban">
-  @for (
-    column of [
-      { status: 'PENDENTE', label: 'Pendente' },
-      { status: 'EM_ANDAMENTO', label: 'Em andamento' },
-      { status: 'AGUARDANDO_AUDITORIA', label: 'Em auditoria' },
-      { status: 'EM_CORRECAO', label: 'Correção' },
-      { status: 'APROVADA', label: 'Aprovada' },
-    ];
-    track column.status
-  ) {
-    <div class="kanban-column">
+<section class="kanban" aria-label="Quadro de tarefas" tabindex="0">
+  @for (column of columns; track column.status) {
+    @let cards = tasksBy(column.status);
+    <section class="kanban-column" [attr.aria-label]="column.label">
       <header>
-        <strong>{{ column.label }}</strong
-        ><span>{{ tasksBy($any(column.status)).length }}</span>
+        <h2>{{ column.label }}</h2>
+        <span>{{ cards.length }}</span>
       </header>
-      @for (task of tasksBy($any(column.status)); track task.id) {
+      @for (task of cards; track task.id) {
         <article class="task-card">
-          <span class="priority-tag priority-tag--{{ task.prioridade.toLowerCase() }}">{{
-            task.prioridade
-          }}</span>
+          <div class="task-card__top">
+            <span class="task-card__key">FO-{{ task.id }}</span>
+            <span class="priority-tag priority-tag--{{ task.prioridade.toLowerCase() }}">{{
+              priorityLabels[task.prioridade]
+            }}</span>
+          </div>
           <h3>{{ task.titulo }}</h3>
-          <p>{{ task.descricao }}</p>
-          <small>{{ task.responsavelNome || 'Sem responsável' }}</small>
+          @if (task.descricao) {
+            <p>{{ task.descricao }}</p>
+          }
+          <div class="task-card__meta">
+            @if (task.prazo) {
+              <span
+                ><svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                >
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="M12 7v5l3 2" /></svg
+                ><time
+                  [attr.datetime]="task.prazo"
+                  [attr.aria-label]="'Prazo: ' + (task.prazo | date: 'dd/MM/yyyy')"
+                  >{{ task.prazo | date: 'dd/MM' }}</time
+                ></span
+              >
+            }
+            @if (task.responsavelNome; as person) {
+              <span
+                class="task-card__avatar"
+                [attr.title]="person"
+                [attr.aria-label]="'Responsável: ' + person"
+                >{{ initials(person) }}</span
+              >
+            }
+          </div>
           @if (actionLabel(task)) {
             <button
               class="button button--small button--secondary"
@@ -97,7 +127,14 @@
             </button>
           }
         </article>
+      } @empty {
+        <p class="kanban-empty">{{ query().trim() ? 'Sem resultados' : 'Sem tarefas' }}</p>
       }
-    </div>
+      @if (column.status === 'PENDENTE' && projectId && !showForm()) {
+        <button class="kanban-add" type="button" (click)="showForm.set(true)">
+          + Adicionar tarefa
+        </button>
+      }
+    </section>
   }
 </section>

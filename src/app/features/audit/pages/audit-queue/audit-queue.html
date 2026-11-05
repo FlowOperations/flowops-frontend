@@ -4,58 +4,114 @@
 />
 
 @if (feedback()) {
-  <div class="notice">{{ feedback() }}</div>
+  <div class="notice" [class.notice--error]="feedbackError()" role="status">{{ feedback() }}</div>
 }
 
-<section class="audit-list">
-  @for (task of tasks(); track task.id) {
-    <article class="audit-card">
-      <div class="audit-card__main">
-        <span class="priority-tag priority-tag--{{ task.prioridade.toLowerCase() }}">{{
-          task.prioridade
-        }}</span>
-        <h2>{{ task.titulo }}</h2>
-        <p>{{ task.descricao }}</p>
-        <small>Responsável: {{ task.responsavelNome }}</small>
-      </div>
-      <div class="audit-card__actions">
-        <button class="button button--ghost" type="button" (click)="openCorrection(task)">
-          Solicitar correção
-        </button>
-        <button class="button button--primary" type="button" (click)="approve(task)">
-          Aprovar tarefa
-        </button>
-      </div>
-    </article>
-  } @empty {
-    <div class="state-card">Nenhuma tarefa aguardando sua auditoria.</div>
-  }
-</section>
+<app-data-grid
+  #grid
+  title="Auditoria"
+  placeholder="Buscar por tarefa ou responsável"
+  emptyText="Nenhuma tarefa aguardando sua auditoria."
+  [items]="tasks()"
+  [loading]="loading()"
+  [searchFields]="taskFields"
+  [sortName]="taskName"
+  [filters]="taskFilters"
+>
+  <thead>
+    <tr>
+      <th scope="col">Tarefa</th>
+      <th scope="col">Responsável</th>
+      <th scope="col">Prioridade</th>
+      <th scope="col">Prazo</th>
+      <th scope="col" class="grid-actions">Ações</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (task of grid.visibleItems(); track task.id) {
+      <tr>
+        <td>
+          <div class="grid-identity">
+            <span class="grid-avatar" aria-hidden="true">{{ initials(task.titulo) }}</span>
+            <div>
+              <strong>{{ task.titulo }}</strong
+              ><small class="grid-summary">{{ task.descricao }}</small>
+            </div>
+          </div>
+        </td>
+        <td>{{ task.responsavelNome || 'Sem responsável' }}</td>
+        <td>
+          <span class="priority-tag priority-tag--{{ task.prioridade.toLowerCase() }}">{{
+            priorityLabels[task.prioridade]
+          }}</span>
+        </td>
+        <td class="grid-number">{{ (task.prazo | date: 'dd/MM/yyyy') || '—' }}</td>
+        <td class="grid-actions">
+          <button
+            class="button button--small button--primary"
+            type="button"
+            [attr.aria-label]="'Auditar ' + task.titulo"
+            (click)="openReview(task, reviewDialog)"
+          >
+            Auditar
+          </button>
+        </td>
+      </tr>
+    }
+  </tbody>
+</app-data-grid>
 
-@if (correctionTask(); as task) {
-  <div class="dialog-backdrop" (click)="closeCorrection()">
-    <form class="dialog-card" (click)="$event.stopPropagation()" (ngSubmit)="submitCorrection()">
-      <span class="eyebrow">Revisão necessária</span>
-      <h2>Solicitar correção</h2>
-      <p>
-        Explique objetivamente o que precisa ser ajustado em <strong>{{ task.titulo }}</strong
-        >.
-      </p>
-      <label
-        >Motivo<textarea
+<dialog
+  #reviewDialog
+  class="audit-dialog"
+  aria-labelledby="review-title"
+  (close)="resetReview()"
+  (cancel)="saving() && $event.preventDefault()"
+>
+  @if (reviewTask(); as task) {
+    <form class="dialog-card" (ngSubmit)="submitReview(reviewDialog, false)">
+      <span class="eyebrow">Revisão de tarefa</span>
+      <h2 id="review-title">{{ task.titulo }}</h2>
+      <p class="review-description">{{ task.descricao }}</p>
+      <p>Responsável: {{ task.responsavelNome || 'Sem responsável' }}</p>
+      @if (reviewError()) {
+        <div class="form-error" role="alert">{{ reviewError() }}</div>
+      }
+      <label>
+        Motivo da correção
+        <textarea
           name="reason"
           [(ngModel)]="correctionReason"
-          rows="5"
+          rows="3"
           maxlength="2000"
-          required
+          placeholder="Descreva o que precisa ser ajustado para solicitar uma correção."
         ></textarea>
       </label>
       <div class="form-actions">
-        <button class="button button--ghost" type="button" (click)="closeCorrection()">
-          Cancelar
+        <button
+          class="button button--ghost"
+          type="button"
+          [disabled]="saving()"
+          (click)="reviewDialog.close()"
+        >
+          Fechar
         </button>
-        <button class="button button--primary" type="submit">Enviar solicitação</button>
+        <button
+          class="button button--secondary"
+          type="submit"
+          [disabled]="saving() || !correctionReason.trim()"
+        >
+          Solicitar correção
+        </button>
+        <button
+          class="button button--primary"
+          type="button"
+          [disabled]="saving()"
+          (click)="submitReview(reviewDialog, true)"
+        >
+          Aprovar tarefa
+        </button>
       </div>
     </form>
-  </div>
-}
+  }
+</dialog>

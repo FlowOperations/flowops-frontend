@@ -1,5 +1,5 @@
-<div class="shell">
-  <aside class="sidebar">
+<div class="shell" [class.shell--collapsed]="sidebarCollapsed()">
+  <aside class="sidebar" id="workspace-sidebar">
     <a class="brand" routerLink="/dashboard" aria-label="FlowOps — Visão geral">
       <span class="brand__mark"><img src="/assets/flowops-logo.png" alt="" /></span>
       <span class="brand__name">Flow<span>Ops</span></span>
@@ -22,16 +22,36 @@
       }
     </nav>
 
-    <div class="workspace-card">
-      <span class="workspace-card__avatar">{{ auth.initials() }}</span>
-      <span>
-        <strong>{{ auth.user()?.nomeCompleto }}</strong>
-        <small>{{
-          auth.user()?.perfilSistema === 'ADMIN_FLOWOPS'
-            ? 'Administração FlowOps'
-            : 'Ambiente de trabalho'
-        }}</small>
-      </span>
+    <div class="sidebar-footer">
+      <button
+        class="sidebar-toggle"
+        type="button"
+        aria-controls="workspace-sidebar"
+        [attr.aria-expanded]="!sidebarCollapsed()"
+        [attr.aria-label]="sidebarCollapsed() ? 'Expandir menu lateral' : 'Recolher menu lateral'"
+        [attr.title]="sidebarCollapsed() ? 'Expandir menu lateral' : 'Recolher menu lateral'"
+        (click)="toggleSidebar()"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          width="18"
+          height="18"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M5 4v16" />
+          <path
+            [attr.d]="
+              sidebarCollapsed() ? 'm10 8 4 4-4 4m5-8 4 4-4 4' : 'm14 8-4 4 4 4m5-8-4 4 4 4'
+            "
+          />
+        </svg>
+        <span>Recolher menu</span>
+      </button>
     </div>
   </aside>
 

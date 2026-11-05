@@ -5,9 +5,7 @@
 }
 
 .login-visual {
-  background:
-    radial-gradient(circle at 12% 85%, rgb(35 202 231 / 18%), transparent 32%),
-    radial-gradient(circle at 90% 10%, rgb(125 72 244 / 28%), transparent 38%), #0c1630;
+  background: #21242e;
   color: white;
   display: flex;
   flex-direction: column;
@@ -24,7 +22,7 @@
   gap: 10px;
 }
 .login-brand > span:last-child > span {
-  color: #5ce1f0;
+  color: #a7bfff;
 }
 .brand-symbol {
   align-items: center;
@@ -58,7 +56,7 @@
   color: #7f91b5;
 }
 .eyebrow {
-  color: #48d7ee;
+  color: #a7bfff;
   font-size: 12px;
   font-weight: 750;
   letter-spacing: 0.1em;
@@ -80,16 +78,23 @@
   top: 28px;
 }
 .login-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   display: grid;
-  gap: 22px;
+  gap: 16px;
   max-width: 420px;
+  padding: clamp(16px, 3vw, 28px);
   width: 100%;
+}
+.login-card .eyebrow {
+  color: var(--color-primary-ink);
 }
 .login-card--register {
   max-width: 520px;
 }
 .login-card h2 {
-  font-size: 32px;
+  font-size: 26px;
   letter-spacing: -0.035em;
   margin: 8px 0;
 }

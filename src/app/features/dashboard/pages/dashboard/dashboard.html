@@ -1,30 +1,9 @@
-<section class="overview-banner" aria-labelledby="overview-title">
-  <div class="overview-banner__copy">
-    <span class="overview-banner__eyebrow">SEU CENTRO DE OPERAÇÕES</span>
-    <h2 id="overview-title">Tudo conectado.<br /><span>Seu trabalho em movimento.</span></h2>
-    <p>
-      Projetos, pessoas e entregas em um só lugar. Acompanhe o que importa e dê o próximo passo.
-    </p>
-    <div class="overview-banner__actions">
-      <a class="button" routerLink="/projetos"
-        >Explorar projetos <span aria-hidden="true">↗</span></a
-      >
-      <a class="overview-banner__link" routerLink="/tarefas"
-        >Ver tarefas <span aria-hidden="true">→</span></a
-      >
-    </div>
+<app-page-header title="Visão geral" description="Acompanhe seus projetos, tarefas e auditorias.">
+  <div class="dashboard-actions">
+    <a class="button button--ghost" routerLink="/projetos">Projetos</a>
+    <a class="button button--primary" routerLink="/tarefas">Abrir quadro</a>
   </div>
-  <div class="overview-banner__visual" aria-hidden="true">
-    <app-icon name="project" [size]="36" />
-    <app-icon name="task" [size]="36" />
-    <app-icon name="audit" [size]="36" />
-  </div>
-</section>
-
-<app-page-header
-  title="Visão geral"
-  description="Os principais números da sua operação, em tempo real."
-/>
+</app-page-header>
 
 @if (feedback()) {
   <div class="notice notice--error">{{ feedback() }}</div>

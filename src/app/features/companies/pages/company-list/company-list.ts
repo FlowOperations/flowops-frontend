@@ -13,6 +13,8 @@ import { AuthService } from '@core/services/auth.service';
 import { FlowOpsApiService } from '@core/services/flowops-api.service';
 import { apiErrorMessage } from '@core/utils/api-error.util';
 import { PageHeader } from '@shared/ui/page-header/page-header';
+import { DataGrid } from '@shared/ui/data-grid/data-grid';
+import { initials } from '@shared/ui/data-grid/list-display';
 import { finalize } from 'rxjs';
 
 type CompanyField = 'razaoSocial' | 'nomeFantasia' | 'cnpj' | 'gestorInicialId' | 'cargoGestor';
@@ -35,7 +37,7 @@ const companyFieldIds: Record<CompanyField, string> = {
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, PageHeader],
+  imports: [FormsModule, PageHeader, DataGrid],
   selector: 'app-company-list',
   templateUrl: './company-list.html',
 })
@@ -52,6 +54,19 @@ export class CompanyList {
   protected readonly feedbackError = signal(false);
   protected readonly fieldErrors = signal<Partial<Record<CompanyField, string>>>({});
   protected readonly isAdmin = computed(() => this.auth.user()?.perfilSistema === 'ADMIN_FLOWOPS');
+  protected readonly initials = initials;
+  protected readonly companyName = (company: Empresa) => company.nomeFantasia;
+  protected readonly companyScopes = [
+    { value: 'nomeFantasia', label: 'Nome fantasia' },
+    { value: 'razaoSocial', label: 'Razão social' },
+    { value: 'cnpj', label: 'CNPJ' },
+  ] as const;
+  protected readonly companyFields = (company: Empresa) =>
+    this.companyScopes.map(({ value }) => company[value]);
+  protected readonly scopedFields = (company: Empresa, scope: string) => {
+    const field = this.companyScopes.find((option) => option.value === scope);
+    return field ? [company[field.value]] : this.companyFields(company);
+  };
   protected corporateName = '';
   protected tradeName = '';
   protected cnpj = '';

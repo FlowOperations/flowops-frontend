@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
+import { FlowOpsApiService } from '@core/services/flowops-api.service';
 import { apiErrorMessage } from '@core/utils/api-error.util';
 import { ThemeToggle } from '@shared/ui/theme-toggle/theme-toggle';
 import { finalize } from 'rxjs';
@@ -17,6 +18,7 @@ import { finalize } from 'rxjs';
 export class Login {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly api = inject(FlowOpsApiService);
 
   protected cpf = '';
   protected senha = '';
@@ -30,7 +32,16 @@ export class Login {
       .login(this.cpf.replace(/\D/g, ''), this.senha)
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
-        next: () => void this.router.navigate(['/dashboard']),
+        next: (response) => {
+          if (response.usuario.perfilSistema === 'ADMIN_FLOWOPS') {
+            void this.router.navigate(['/dashboard']);
+            return;
+          }
+          this.api.listarMeusVinculos().subscribe({
+            next: (links) => void this.router.navigate([links.length ? '/dashboard' : '/empresas']),
+            error: () => void this.router.navigate(['/empresas']),
+          });
+        },
         error: (response: HttpErrorResponse) => {
           this.error.set(apiErrorMessage(response, 'Não foi possível entrar. Confira seus dados.'));
         },

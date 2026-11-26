@@ -47,7 +47,7 @@ export class Dashboard {
 
   private load(): void {
     this.api
-      .listarMeusVinculos()
+      .listarContextosEmpresa()
       .pipe(
         switchMap((links) => {
           const companyIds = [...new Set(links.map((link) => link.empresaId))];

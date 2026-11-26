@@ -8,7 +8,8 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ApiError, Empresa, Usuario } from '@core/models/api.models';
+import { ApiError, Empresa, Usuario, VinculoEmpresa } from '@core/models/api.models';
+import { AccessRequests } from './access-requests';
 import { AuthService } from '@core/services/auth.service';
 import { FlowOpsApiService } from '@core/services/flowops-api.service';
 import { apiErrorMessage } from '@core/utils/api-error.util';
@@ -37,7 +38,7 @@ const companyFieldIds: Record<CompanyField, string> = {
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, PageHeader, DataGrid],
+  imports: [FormsModule, PageHeader, DataGrid, AccessRequests],
   selector: 'app-company-list',
   templateUrl: './company-list.html',
 })
@@ -47,6 +48,9 @@ export class CompanyList {
   private readonly elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
   protected readonly companies = signal<Empresa[]>([]);
   protected readonly users = signal<Usuario[]>([]);
+  protected readonly requests = signal<VinculoEmpresa[]>([]);
+  protected readonly reviewingCompany = signal<Empresa | null>(null);
+  protected readonly requesting = signal<number | null>(null);
   protected readonly loading = signal(true);
   protected readonly saving = signal(false);
   protected readonly showForm = signal(false);
@@ -76,6 +80,7 @@ export class CompanyList {
   constructor() {
     this.load();
     if (this.isAdmin()) this.loadUsers();
+    else this.loadRequests();
   }
 
   protected create(): void {
@@ -136,10 +141,47 @@ export class CompanyList {
   }
 
   protected requestAccess(company: Empresa): void {
+    if (this.requesting()) return;
+    this.requesting.set(company.id);
     this.feedback.set('');
     this.feedbackError.set(false);
-    this.api.solicitarVinculo(company.id).subscribe({
-      next: () => this.feedback.set(`Solicitação enviada para ${company.nomeFantasia}.`),
+    this.api
+      .solicitarVinculo(company.id)
+      .pipe(finalize(() => this.requesting.set(null)))
+      .subscribe({
+        next: () => {
+          this.feedback.set(
+            `Solicitação enviada para ${company.nomeFantasia}. Aguarde a aprovação do gestor.`,
+          );
+          this.loadRequests();
+        },
+        error: (response: HttpErrorResponse) => {
+          this.feedbackError.set(true);
+          this.feedback.set(apiErrorMessage(response));
+        },
+      });
+  }
+
+  protected accessStatus(companyId: number): VinculoEmpresa['status'] | undefined {
+    return this.requests().find((request) => request.empresaId === companyId)?.status;
+  }
+
+  protected canReview(companyId: number): boolean {
+    return (
+      this.isAdmin() ||
+      this.requests().some(
+        (request) =>
+          request.empresaId === companyId &&
+          request.status === 'APROVADO' &&
+          request.ativo &&
+          request.papel === 'GESTOR',
+      )
+    );
+  }
+
+  private loadRequests(): void {
+    this.api.listarMinhasSolicitacoes().subscribe({
+      next: (requests) => this.requests.set(requests),
       error: (response: HttpErrorResponse) => {
         this.feedbackError.set(true);
         this.feedback.set(apiErrorMessage(response));

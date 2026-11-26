@@ -72,6 +72,18 @@ export interface VinculoEmpresa {
   ativo: boolean;
 }
 
+export interface ContextoEmpresa {
+  empresaId: number;
+  empresaNome: string;
+}
+
+export interface ProjetoMembro {
+  usuarioId: number;
+  nome: string;
+  email: string;
+  ativo: boolean;
+}
+
 export interface Projeto {
   id: number;
   empresaId: number;

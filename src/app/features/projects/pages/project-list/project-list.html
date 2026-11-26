@@ -1,5 +1,10 @@
 <app-page-header title="Projetos" description="Crie projetos e acompanhe o progresso das entregas.">
-  <button class="button button--primary" type="button" (click)="showForm.set(!showForm())">
+  <button
+    class="button button--primary"
+    type="button"
+    [disabled]="!managers().length"
+    (click)="showForm.set(!showForm())"
+  >
     Novo projeto
   </button>
 </app-page-header>
@@ -17,6 +22,14 @@
       </div>
     </div>
     <div class="form-grid">
+      <label
+        >Gestor responsável
+        <select [(ngModel)]="managerId" name="managerId" required>
+          @for (manager of managers(); track manager.usuarioId) {
+            <option [ngValue]="manager.usuarioId">{{ manager.usuarioNome }}</option>
+          }
+        </select>
+      </label>
       <label>Nome<input [(ngModel)]="name" name="name" required /></label>
       <label>Descrição<input [(ngModel)]="description" name="description" required /></label>
       <label

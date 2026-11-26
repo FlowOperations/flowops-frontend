@@ -7,7 +7,7 @@ import { UserList } from './user-list';
 const createdUser: UsuarioAdministracao = {
   id: 9,
   nomeCompleto: 'Coordenadora Teste',
-  cpf: '90000000001',
+  cpf: '52998224725',
   email: 'coordenadora@flowops.local',
   dataNascimento: '1995-01-15',
   perfilSistema: 'USUARIO',
@@ -86,7 +86,7 @@ describe('UserList', () => {
     fixture.detectChanges();
 
     await setInput('#user-name', 'Coordenadora Teste');
-    await setInput('#user-cpf', '900.000.000-01');
+    await setInput('#user-cpf', '529.982.247-25');
     await setInput('#user-email', 'coordenadora@flowops.local');
     await setInput('#user-birth-date', '1995-01-15');
     await setInput('#user-password', 'Coordenador123!');
@@ -104,7 +104,7 @@ describe('UserList', () => {
 
     expect(api.createdPayload).toEqual({
       nomeCompleto: 'Coordenadora Teste',
-      cpf: '90000000001',
+      cpf: '52998224725',
       email: 'coordenadora@flowops.local',
       senha: 'Coordenador123!',
       dataNascimento: '1995-01-15',

@@ -2,7 +2,13 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { PrioridadeTarefa, Projeto, Tarefa, VinculoEmpresa } from '@core/models/api.models';
+import {
+  PrioridadeTarefa,
+  Projeto,
+  Tarefa,
+  ContextoEmpresa,
+  ProjetoMembro,
+} from '@core/models/api.models';
 import { AuthService } from '@core/services/auth.service';
 import { FlowOpsApiService } from '@core/services/flowops-api.service';
 import { apiErrorMessage } from '@core/utils/api-error.util';
@@ -21,7 +27,10 @@ import { Subscription } from 'rxjs';
 export class TaskBoard {
   private readonly api = inject(FlowOpsApiService);
   private readonly auth = inject(AuthService);
-  protected readonly links = signal<VinculoEmpresa[]>([]);
+  protected readonly links = signal<ContextoEmpresa[]>([]);
+  protected readonly members = signal<ProjetoMembro[]>([]);
+  protected readonly saving = signal(false);
+  protected readonly deadlineError = signal('');
   protected readonly projects = signal<Projeto[]>([]);
   protected readonly tasks = signal<Tarefa[]>([]);
   protected readonly query = signal('');
@@ -43,6 +52,7 @@ export class TaskBoard {
   );
   private projectRequest?: Subscription;
   private taskRequest?: Subscription;
+  private memberRequest?: Subscription;
   protected readonly showForm = signal(false);
   protected readonly feedback = signal('');
   protected readonly initials = initials;
@@ -63,7 +73,7 @@ export class TaskBoard {
   protected responsibleId: number | null = null;
 
   constructor() {
-    this.api.listarMeusVinculos().subscribe({
+    this.api.listarContextosEmpresa().subscribe({
       next: (links) => {
         this.links.set(links);
         this.companyId = links[0]?.empresaId ?? null;
@@ -91,6 +101,9 @@ export class TaskBoard {
 
   protected loadTasks(): void {
     this.taskRequest?.unsubscribe();
+    this.memberRequest?.unsubscribe();
+    this.members.set([]);
+    this.responsibleId = null;
     this.tasks.set([]);
     if (!this.projectId) {
       return;
@@ -99,10 +112,21 @@ export class TaskBoard {
       next: (tasks) => this.tasks.set(tasks),
       error: (response: HttpErrorResponse) => this.feedback.set(apiErrorMessage(response)),
     });
+    this.memberRequest = this.api.listarMembrosProjeto(this.projectId).subscribe({
+      next: (members) => this.members.set(members),
+      error: (response: HttpErrorResponse) => this.feedback.set(apiErrorMessage(response)),
+    });
   }
 
   protected create(): void {
-    if (!this.projectId) return;
+    if (!this.projectId || this.saving()) return;
+    this.deadlineError.set(
+      !this.deadline || new Date(this.deadline).getTime() < Date.now()
+        ? 'Informe uma data e hora futura para o prazo.'
+        : '',
+    );
+    if (this.deadlineError()) return;
+    this.saving.set(true);
     this.api
       .criarTarefa({
         projetoId: this.projectId,
@@ -110,15 +134,19 @@ export class TaskBoard {
         descricao: this.description,
         prioridade: this.priority,
         prazo: this.deadline,
-        responsavelId: this.responsibleId || this.auth.user()?.id || null,
+        responsavelId: this.responsibleId,
       })
       .subscribe({
         next: () => {
+          this.saving.set(false);
           this.showForm.set(false);
           this.resetForm();
           this.loadTasks();
         },
-        error: (response: HttpErrorResponse) => this.feedback.set(apiErrorMessage(response)),
+        error: (response: HttpErrorResponse) => {
+          this.saving.set(false);
+          this.feedback.set(apiErrorMessage(response));
+        },
       });
   }
 
@@ -134,6 +162,7 @@ export class TaskBoard {
   }
 
   protected actionLabel(task: Tarefa): string {
+    if (task.responsavelId !== this.auth.user()?.id) return '';
     if (task.status === 'PENDENTE' || task.status === 'EM_CORRECAO') return 'Iniciar';
     if (task.status === 'EM_ANDAMENTO') return 'Enviar para auditoria';
     return '';

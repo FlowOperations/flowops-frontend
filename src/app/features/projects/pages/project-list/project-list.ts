@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Projeto, StatusProjeto, VinculoEmpresa } from '@core/models/api.models';
+import { Projeto, StatusProjeto, ContextoEmpresa, VinculoEmpresa } from '@core/models/api.models';
 import { AuthService } from '@core/services/auth.service';
 import { FlowOpsApiService } from '@core/services/flowops-api.service';
 import { apiErrorMessage } from '@core/utils/api-error.util';
@@ -20,13 +20,16 @@ import { finalize, Subscription } from 'rxjs';
 export class ProjectList {
   private readonly api = inject(FlowOpsApiService);
   private readonly auth = inject(AuthService);
-  protected readonly links = signal<VinculoEmpresa[]>([]);
+  protected readonly links = signal<ContextoEmpresa[]>([]);
+  protected readonly managers = signal<VinculoEmpresa[]>([]);
+  protected managerId: number | null = null;
   protected readonly companyOptions = computed(() =>
     this.links().map(({ empresaId, empresaNome }) => ({ value: empresaId, label: empresaNome })),
   );
   protected readonly projects = signal<Projeto[]>([]);
   protected readonly loading = signal(true);
   private projectRequest?: Subscription;
+  private managersRequest?: Subscription;
   protected readonly initials = initials;
   protected readonly statusLabels: Record<StatusProjeto, string> = {
     PLANEJAMENTO: 'Planejamento',
@@ -60,7 +63,7 @@ export class ProjectList {
   protected endDate = '';
 
   constructor() {
-    this.api.listarMeusVinculos().subscribe({
+    this.api.listarContextosEmpresa().subscribe({
       next: (links) => {
         this.links.set(links);
         this.companyId = links[0]?.empresaId ?? null;
@@ -75,12 +78,27 @@ export class ProjectList {
 
   protected loadProjects(): void {
     this.projectRequest?.unsubscribe();
+    this.managersRequest?.unsubscribe();
     this.projects.set([]);
+    this.managers.set([]);
+    this.managerId = null;
     if (!this.companyId) {
       this.loading.set(false);
       return;
     }
     this.loading.set(true);
+    this.managersRequest = this.api.listarColaboradores(this.companyId).subscribe({
+      next: (links) => {
+        this.managers.set(
+          links.filter((link) => link.papel === 'GESTOR' || link.papel === 'COORDENADOR'),
+        );
+        this.managerId =
+          this.managers().find((link) => link.usuarioId === this.auth.user()?.id)?.usuarioId ??
+          this.managers()[0]?.usuarioId ??
+          null;
+      },
+      error: () => this.managers.set([]),
+    });
     this.projectRequest = this.api
       .listarProjetos(this.companyId)
       .pipe(finalize(() => this.loading.set(false)))
@@ -91,7 +109,7 @@ export class ProjectList {
   }
 
   protected create(): void {
-    const userId = this.auth.user()?.id;
+    const userId = this.managerId;
     if (!this.companyId || !userId) return;
     this.api
       .criarProjeto({

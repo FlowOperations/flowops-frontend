@@ -6,5 +6,7 @@ export function apiErrorMessage(
   fallback = 'Não foi possível concluir a operação.',
 ): string {
   const error = response.error as ApiError | null;
+  const messages = Object.values(error?.campos ?? {});
+  if (messages.length) return messages.join(' ');
   return error?.mensagem ?? error?.message ?? fallback;
 }

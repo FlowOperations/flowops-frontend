@@ -11,12 +11,59 @@ import {
   Usuario,
   UsuarioAdministracao,
   VinculoEmpresa,
+  ContextoEmpresa,
+  PapelEmpresa,
+  ProjetoMembro,
 } from '@core/models/api.models';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
+import { AuthService } from './auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class FlowOpsApiService {
   private readonly http = inject(HttpClient);
+  private readonly auth = inject(AuthService);
+
+  listarContextosEmpresa(): Observable<ContextoEmpresa[]> {
+    return this.auth.user()?.perfilSistema === 'ADMIN_FLOWOPS'
+      ? this.listarEmpresas().pipe(
+          map((companies) =>
+            companies.map((company) => ({
+              empresaId: company.id,
+              empresaNome: company.nomeFantasia,
+            })),
+          ),
+        )
+      : this.listarMeusVinculos();
+  }
+
+  listarMinhasSolicitacoes(): Observable<VinculoEmpresa[]> {
+    return this.http.get<VinculoEmpresa[]>('/api/vinculos/solicitacoes/minhas');
+  }
+
+  listarSolicitacoesPendentes(empresaId: number): Observable<VinculoEmpresa[]> {
+    return this.http.get<VinculoEmpresa[]>(`/api/vinculos/empresas/${empresaId}/pendentes`);
+  }
+
+  analisarSolicitacao(
+    id: number,
+    aprovado: boolean,
+    cargo: string,
+    papel: PapelEmpresa,
+  ): Observable<VinculoEmpresa> {
+    return this.http.patch<VinculoEmpresa>(`/api/vinculos/${id}/analise`, {
+      aprovado,
+      cargo,
+      papel,
+    });
+  }
+
+  listarColaboradores(empresaId: number): Observable<VinculoEmpresa[]> {
+    return this.http.get<VinculoEmpresa[]>(`/api/vinculos/empresas/${empresaId}/colaboradores`);
+  }
+
+  listarMembrosProjeto(projetoId: number): Observable<ProjetoMembro[]> {
+    return this.http.get<ProjetoMembro[]>(`/api/projetos/${projetoId}/membros`);
+  }
 
   listarEmpresas(): Observable<Empresa[]> {
     return this.http.get<Empresa[]>('/api/empresas');

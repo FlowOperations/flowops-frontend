@@ -51,20 +51,35 @@
         </select></label
       >
       <label
-        >Prazo<input [(ngModel)]="deadline" name="deadline" type="datetime-local" required
-      /></label>
+        >Prazo<input
+          [(ngModel)]="deadline"
+          name="deadline"
+          type="datetime-local"
+          required
+          [attr.aria-invalid]="deadlineError() ? 'true' : null"
+          [attr.aria-describedby]="deadlineError() ? 'task-deadline-error' : null"
+          (ngModelChange)="deadlineError.set('')"
+        />
+        @if (deadlineError()) {
+          <small class="field-error" id="task-deadline-error">{{ deadlineError() }}</small>
+        }
+      </label>
       <label
-        >ID do responsável<input
-          [(ngModel)]="responsibleId"
-          name="responsibleId"
-          type="number"
-          placeholder="Você será usado se vazio"
-      /></label>
+        >Responsável
+        <select [(ngModel)]="responsibleId" name="responsibleId">
+          <option [ngValue]="null">Sem responsável</option>
+          @for (member of members(); track member.usuarioId) {
+            <option [ngValue]="member.usuarioId">{{ member.nome }}</option>
+          }
+        </select>
+      </label>
     </div>
     <div class="form-actions">
       <button class="button button--ghost" type="button" (click)="showForm.set(false)">
         Cancelar</button
-      ><button class="button button--primary" type="submit">Criar tarefa</button>
+      ><button class="button button--primary" type="submit" [disabled]="saving() || !projectId">
+        {{ saving() ? 'Salvando…' : 'Criar tarefa' }}
+      </button>
     </div>
   </form>
 }

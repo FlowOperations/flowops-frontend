@@ -104,7 +104,7 @@ describe('CompanyList field validation', () => {
     ).toContain('Informe a razão social.');
   });
 
-  it('keeps the general API message when no recognized field details are returned', () => {
+  it('shows validation details even when the field is not recognized by this form', () => {
     submitForm();
 
     api.createResponse.error(
@@ -112,7 +112,7 @@ describe('CompanyList field validation', () => {
     );
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.querySelector('.notice').textContent).toContain('Dados inválidos');
+    expect(fixture.nativeElement.querySelector('.notice').textContent).toContain('Valor inválido.');
     expect(fixture.nativeElement.querySelector('.field-error')).toBeNull();
   });
 

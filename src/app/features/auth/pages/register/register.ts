@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
 import { apiErrorMessage } from '@core/utils/api-error.util';
+import { isValidCpf } from '@core/utils/cpf.util';
 import { ThemeToggle } from '@shared/ui/theme-toggle/theme-toggle';
 import { finalize } from 'rxjs';
 
@@ -25,8 +26,11 @@ export class Register {
   protected password = '';
   protected readonly loading = signal(false);
   protected readonly error = signal('');
+  protected readonly cpfError = signal('');
 
   protected submit(): void {
+    this.cpfError.set(isValidCpf(this.cpf) ? '' : 'Informe um CPF válido.');
+    if (this.cpfError()) return;
     this.error.set('');
     this.loading.set(true);
     this.auth

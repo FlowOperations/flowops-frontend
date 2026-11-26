@@ -22,6 +22,9 @@
         CPF
         <input
           id="user-cpf"
+          [attr.aria-invalid]="cpfError() ? 'true' : null"
+          [attr.aria-describedby]="cpfError() ? 'user-cpf-error' : null"
+          (ngModelChange)="cpfError.set('')"
           [(ngModel)]="cpf"
           name="cpf"
           inputmode="numeric"
@@ -29,6 +32,9 @@
           placeholder="000.000.000-00"
           required
         />
+        @if (cpfError()) {
+          <small class="field-error" id="user-cpf-error">{{ cpfError() }}</small>
+        }
       </label>
       <label>
         E-mail

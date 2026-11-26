@@ -10,6 +10,7 @@ import {
 } from '@core/models/api.models';
 import { FlowOpsApiService } from '@core/services/flowops-api.service';
 import { apiErrorMessage } from '@core/utils/api-error.util';
+import { isValidCpf } from '@core/utils/cpf.util';
 import { PageHeader } from '@shared/ui/page-header/page-header';
 import { DataGrid, GridFilter } from '@shared/ui/data-grid/data-grid';
 import { initials } from '@shared/ui/data-grid/list-display';
@@ -32,6 +33,7 @@ export class UserList {
   protected readonly showForm = signal(false);
   protected readonly feedback = signal('');
   protected readonly feedbackError = signal(false);
+  protected readonly cpfError = signal('');
   protected readonly accessTypes: ReadonlyArray<{ value: TipoAcessoUsuario; label: string }> = [
     { value: 'ADMIN_FLOWOPS', label: 'Administrador FlowOps' },
     { value: 'GESTOR', label: 'Gestor' },
@@ -140,6 +142,8 @@ export class UserList {
   }
 
   protected create(): void {
+    this.cpfError.set(isValidCpf(this.cpf) ? '' : 'Informe um CPF válido.');
+    if (this.cpfError()) return;
     const payload: CadastroUsuarioAdmin = {
       nomeCompleto: this.name.trim(),
       cpf: this.cpf.replace(/\D/g, ''),
@@ -205,6 +209,7 @@ export class UserList {
   private resetForm(): void {
     this.name = '';
     this.cpf = '';
+    this.cpfError.set('');
     this.email = '';
     this.birthDate = '';
     this.password = '';

@@ -30,8 +30,20 @@
           >Nome completo<input name="name" [(ngModel)]="name" autocomplete="name" required
         /></label>
         <label
-          >CPF<input name="cpf" [(ngModel)]="cpf" inputmode="numeric" maxlength="14" required
-        /></label>
+          >CPF<input
+            name="cpf"
+            [(ngModel)]="cpf"
+            inputmode="numeric"
+            maxlength="14"
+            required
+            [attr.aria-invalid]="cpfError() ? 'true' : null"
+            [attr.aria-describedby]="cpfError() ? 'register-cpf-error' : null"
+            (ngModelChange)="cpfError.set('')"
+          />
+          @if (cpfError()) {
+            <small class="field-error" id="register-cpf-error">{{ cpfError() }}</small>
+          }
+        </label>
         <label
           >Data de nascimento<input name="birthDate" [(ngModel)]="birthDate" type="date" required
         /></label>

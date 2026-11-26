@@ -140,9 +140,7 @@
       <th scope="col">Empresa</th>
       <th scope="col">CNPJ</th>
       <th scope="col">Status</th>
-      @if (!isAdmin()) {
-        <th scope="col" class="grid-actions">Ações</th>
-      }
+      <th scope="col" class="grid-actions">Acesso</th>
     </tr>
   </thead>
   <tbody>
@@ -159,18 +157,35 @@
         </td>
         <td class="grid-number">{{ formatCnpj(company.cnpj) }}</td>
         <td><span class="status status--active">Ativa</span></td>
-        @if (!isAdmin()) {
-          <td class="grid-actions">
+        <td class="grid-actions">
+          @if (canReview(company.id)) {
+            <button
+              class="button button--small button--secondary"
+              type="button"
+              (click)="reviewingCompany.set(company)"
+            >
+              Solicitações
+            </button>
+          } @else if (accessStatus(company.id) === 'SOLICITADO') {
+            <span class="status">Aguardando aprovação</span>
+          } @else if (accessStatus(company.id) === 'APROVADO') {
+            <span class="status status--active">Acesso aprovado</span>
+          } @else {
             <button
               class="button button--small button--secondary"
               type="button"
               (click)="requestAccess(company)"
+              [disabled]="requesting() !== null"
             >
               Solicitar acesso
             </button>
-          </td>
-        }
+          }
+        </td>
       </tr>
     }
   </tbody>
 </app-data-grid>
+
+@if (reviewingCompany(); as company) {
+  <app-access-requests [companyId]="company.id" [companyName]="company.nomeFantasia" />
+}
